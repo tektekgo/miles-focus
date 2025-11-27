@@ -17,6 +17,7 @@ import { parseGoogleTimeline, calculateMonthlySummaries } from "@/utils/timeline
 import { exportToExcel } from "@/utils/excelExport";
 import { exportToPDF } from "@/utils/pdfExport";
 import { useToast } from "@/hooks/use-toast";
+import { IRSRates } from "@/config/irsRates";
 
 const Index = () => {
   const [rawData, setRawData] = useState<GoogleTimelineActivity[] | null>(null);
@@ -25,6 +26,7 @@ const Index = () => {
   const [selectedPurposes, setSelectedPurposes] = useState<TripPurpose[]>(["Business", "Personal", "Medical", "Charitable", "Other"]);
   const [showUnassignedOnly, setShowUnassignedOnly] = useState(false);
   const [defaultPurpose, setDefaultPurpose] = useState<TripPurpose>("Unassigned");
+  const [customRates, setCustomRates] = useState<IRSRates | null>(null);
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [geocodingProgress, setGeocodingProgress] = useState({ current: 0, total: 0 });
   const { toast } = useToast();
@@ -74,7 +76,7 @@ const Index = () => {
       return;
     }
     
-    exportToExcel(trips, summaries, selectedMonth === "all" ? "" : selectedMonth, selectedPurposes);
+    exportToExcel(trips, summaries, selectedMonth === "all" ? "" : selectedMonth, selectedPurposes, customRates);
     toast({
       title: "Excel Exported!",
       description: "Your mileage report has been downloaded.",
@@ -91,7 +93,7 @@ const Index = () => {
       return;
     }
     
-    exportToPDF(trips, summaries, selectedMonth === "all" ? "" : selectedMonth, selectedPurposes);
+    exportToPDF(trips, summaries, selectedMonth === "all" ? "" : selectedMonth, selectedPurposes, customRates);
     toast({
       title: "PDF Exported!",
       description: "Your IRS-ready report has been downloaded.",
@@ -264,7 +266,10 @@ const Index = () => {
 
             <MonthlySummary summaries={summaries} selectedMonth={selectedMonth} />
             
-            <IRSRatesPanel />
+            <IRSRatesPanel 
+              customRates={customRates}
+              onRatesChange={setCustomRates}
+            />
             
             <EstimatedDeduction 
               businessMiles={
@@ -272,6 +277,7 @@ const Index = () => {
                   ? summaries.reduce((sum, s) => sum + s.businessMiles, 0)
                   : summaries.find(s => s.month === selectedMonth)?.businessMiles || 0
               }
+              customRates={customRates}
             />
             
             <TripsTable 

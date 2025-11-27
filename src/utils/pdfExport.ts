@@ -2,14 +2,17 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { NormalizedTrip, MonthlySummary, TripPurpose } from "@/types/trip";
 import logoUrl from "@/assets/ai-focus-logo.png";
-import { CURRENT_IRS_RATES, calculateDeduction, formatRate } from "@/config/irsRates";
+import { CURRENT_IRS_RATES, calculateDeduction, formatRate, IRSRates } from "@/config/irsRates";
 
 export function exportToPDF(
   trips: NormalizedTrip[], 
   summaries: MonthlySummary[], 
   month: string,
-  purposes: TripPurpose[] = ["Business", "Personal", "Medical", "Charitable", "Other", "Unassigned"]
+  purposes: TripPurpose[] = ["Business", "Personal", "Medical", "Charitable", "Other", "Unassigned"],
+  customRates: IRSRates | null = null
 ) {
+  const activeRates = customRates || CURRENT_IRS_RATES;
+  const isCustom = customRates !== null;
   const doc = new jsPDF();
   
   // AI-Focus brand colors
@@ -85,15 +88,15 @@ export function exportToPDF(
   yPos += 10;
   doc.setFontSize(12);
   doc.setTextColor(navyBlue[0], navyBlue[1], navyBlue[2]);
-  doc.text("IRS Standard Mileage Rates & Estimated Deduction", 15, yPos);
+  doc.text(isCustom ? "Custom Mileage Rates & Estimated Deduction" : "IRS Standard Mileage Rates & Estimated Deduction", 15, yPos);
   
   yPos += 7;
   doc.setFontSize(10);
   doc.setTextColor(darkGrey[0], darkGrey[1], darkGrey[2]);
-  doc.text(`Business: ${formatRate(CURRENT_IRS_RATES.business)}/mile  •  Medical: ${formatRate(CURRENT_IRS_RATES.medical)}/mile  •  Charitable: ${formatRate(CURRENT_IRS_RATES.charitable)}/mile`, 15, yPos);
+  doc.text(`Business: ${formatRate(activeRates.business)}/mile  •  Medical: ${formatRate(activeRates.medical)}/mile  •  Charitable: ${formatRate(activeRates.charitable)}/mile`, 15, yPos);
   
   yPos += 8;
-  const businessDeduction = calculateDeduction(summary.businessMiles, CURRENT_IRS_RATES.business);
+  const businessDeduction = calculateDeduction(summary.businessMiles, activeRates.business);
   doc.setFont(undefined, 'bold');
   doc.setFontSize(14);
   doc.setTextColor(navyBlue[0], navyBlue[1], navyBlue[2]);
@@ -103,7 +106,7 @@ export function exportToPDF(
   doc.setFont(undefined, 'normal');
   doc.setFontSize(9);
   doc.setTextColor(grey[0], grey[1], grey[2]);
-  doc.text(`(Based on ${CURRENT_IRS_RATES.year} IRS rate: ${formatRate(CURRENT_IRS_RATES.business)}/mile)`, 15, yPos);
+  doc.text(`(Based on ${isCustom ? 'custom' : `${activeRates.year} IRS`} rate: ${formatRate(activeRates.business)}/mile)`, 15, yPos);
   
   // Business Trips Table
   yPos += 10;
