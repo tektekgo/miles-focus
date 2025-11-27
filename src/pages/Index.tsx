@@ -7,13 +7,14 @@ import { MonthlySummary } from "@/components/MonthlySummary";
 import { IRSRatesPanel } from "@/components/IRSRatesPanel";
 import { EstimatedDeduction } from "@/components/EstimatedDeduction";
 import { DeductionComparison } from "@/components/DeductionComparison";
+import { DateRangeSelector, DateRange } from "@/components/DateRangeSelector";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Download, FileSpreadsheet, FileText, Filter, AlertCircle, ListFilter } from "lucide-react";
+import { FileSpreadsheet, FileText, Filter, AlertCircle, ListFilter } from "lucide-react";
 import { GoogleTimelineActivity, NormalizedTrip, TripPurpose } from "@/types/trip";
 import { parseGoogleTimeline, calculateMonthlySummaries } from "@/utils/timelineParser";
 import { exportToExcel } from "@/utils/excelExport";
@@ -24,7 +25,7 @@ import { IRSRates } from "@/config/irsRates";
 const Index = () => {
   const [rawData, setRawData] = useState<GoogleTimelineActivity[] | null>(null);
   const [trips, setTrips] = useState<NormalizedTrip[]>([]);
-  const [selectedMonth, setSelectedMonth] = useState<string>("all");
+  const [selectedRange, setSelectedRange] = useState<DateRange>({ type: "all", value: "all", label: "All Months" });
   const [selectedPurposes, setSelectedPurposes] = useState<TripPurpose[]>(["Business", "Personal", "Medical", "Charitable", "Other"]);
   const [showUnassignedOnly, setShowUnassignedOnly] = useState(false);
   const [defaultPurpose, setDefaultPurpose] = useState<TripPurpose>("Unassigned");
@@ -68,6 +69,37 @@ const Index = () => {
   
   const availableMonths = ["all", ...summaries.map(s => s.month)];
 
+  // Helper to get filtered months from date range selection
+  const getFilteredMonths = (): string[] => {
+    if (selectedRange.type === "all") return [];
+    if (selectedRange.type === "month") return [selectedRange.value as string];
+    if (selectedRange.type === "months" || selectedRange.type === "quarter" || 
+        selectedRange.type === "ytd" || selectedRange.type === "taxYear") {
+      return selectedRange.value as string[];
+    }
+    if (selectedRange.type === "days") {
+      // Calculate months within last N days
+      const days = selectedRange.value as number;
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - days);
+      return summaries
+        .filter(s => {
+          const [monthName, year] = s.month.split(" ");
+          const monthDate = new Date(`${monthName} 1, ${year}`);
+          return monthDate >= cutoffDate;
+        })
+        .map(s => s.month);
+    }
+    return [];
+  };
+
+  // Get the "selectedMonth" for legacy components (MonthlySummary, TripsTable)
+  const getLegacySelectedMonth = (): string => {
+    if (selectedRange.type === "all") return "all";
+    if (selectedRange.type === "month") return selectedRange.value as string;
+    return "all"; // For multi-month selections, show all in table and let filtering happen in exports
+  };
+
   const handleExportExcel = () => {
     if (trips.length === 0) {
       toast({
@@ -78,7 +110,8 @@ const Index = () => {
       return;
     }
     
-    exportToExcel(trips, summaries, selectedMonth === "all" ? "" : selectedMonth, selectedPurposes, customRates);
+    const filteredMonths = getFilteredMonths();
+    exportToExcel(trips, summaries, filteredMonths, selectedPurposes, customRates, selectedRange.label);
     toast({
       title: "Excel Exported!",
       description: "Your mileage report has been downloaded.",
@@ -95,7 +128,8 @@ const Index = () => {
       return;
     }
     
-    exportToPDF(trips, summaries, selectedMonth === "all" ? "" : selectedMonth, selectedPurposes, customRates);
+    const filteredMonths = getFilteredMonths();
+    exportToPDF(trips, summaries, filteredMonths, selectedPurposes, customRates, selectedRange.label);
     toast({
       title: "PDF Exported!",
       description: "Your IRS-ready report has been downloaded.",
@@ -211,18 +245,11 @@ const Index = () => {
               </div>
               
               <div className="flex flex-wrap items-center gap-3">
-                <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select month" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableMonths.map(month => (
-                      <SelectItem key={month} value={month}>
-                        {month === "all" ? "All Months" : month}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <DateRangeSelector
+                  availableMonths={availableMonths}
+                  selectedRange={selectedRange}
+                  onRangeChange={setSelectedRange}
+                />
                 
                 <Button 
                   variant={showUnassignedOnly ? "default" : "outline"}
@@ -274,7 +301,7 @@ const Index = () => {
               </div>
             </div>
 
-            <MonthlySummary summaries={summaries} selectedMonth={selectedMonth} />
+            <MonthlySummary summaries={summaries} selectedMonth={getLegacySelectedMonth()} />
             
             <IRSRatesPanel 
               customRates={customRates}
@@ -284,9 +311,9 @@ const Index = () => {
             {customRates && (
               <DeductionComparison
                 businessMiles={
-                  selectedMonth === "all" 
+                  getLegacySelectedMonth() === "all" 
                     ? summaries.reduce((sum, s) => sum + s.businessMiles, 0)
-                    : summaries.find(s => s.month === selectedMonth)?.businessMiles || 0
+                    : summaries.find(s => s.month === getLegacySelectedMonth())?.businessMiles || 0
                 }
                 customRates={customRates}
               />
@@ -294,9 +321,9 @@ const Index = () => {
             
             <EstimatedDeduction 
               businessMiles={
-                selectedMonth === "all" 
+                getLegacySelectedMonth() === "all" 
                   ? summaries.reduce((sum, s) => sum + s.businessMiles, 0)
-                  : summaries.find(s => s.month === selectedMonth)?.businessMiles || 0
+                  : summaries.find(s => s.month === getLegacySelectedMonth())?.businessMiles || 0
               }
               customRates={customRates}
             />
@@ -304,7 +331,7 @@ const Index = () => {
             <TripsTable 
               trips={trips} 
               onTripUpdate={handleTripUpdate}
-              selectedMonth={selectedMonth}
+              selectedMonth={getLegacySelectedMonth()}
               showUnassignedOnly={showUnassignedOnly}
               onToggleUnassignedOnly={() => setShowUnassignedOnly(!showUnassignedOnly)}
             />
@@ -315,7 +342,7 @@ const Index = () => {
                 onClick={() => {
                   setRawData(null);
                   setTrips([]);
-                  setSelectedMonth("all");
+                  setSelectedRange({ type: "all", value: "all", label: "All Months" });
                 }}
               >
                 Upload Different File
