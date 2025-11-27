@@ -25,6 +25,7 @@ import {
 import { FileUp, BarChart3, FileText, Shield, ArrowRight, CheckCircle, ChevronDown, Menu, Download, PlayCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import logoUrl from "@/assets/ai-focus-logo.png";
+import logoNoText from "@/assets/ai-focus-logo-notext.png";
 import { DemoViewer } from "@/components/DemoViewer";
 
 const Landing = () => {
@@ -400,33 +401,35 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-muted/30 border-t py-12 px-4">
+      <footer className="bg-muted/30 border-t py-10 px-4">
         <div className="container mx-auto max-w-6xl">
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-6">
+            {/* Brand Section */}
             <div>
-              <div className="flex items-center gap-2 mb-4">
-                <img src={logoUrl} alt="AI-Focus Logo" className="h-8 w-8" />
+              <div className="flex items-center gap-3 mb-3">
+                <img src={logoNoText} alt="AI-Focus Logo" className="h-10 w-10" />
                 <h4 className="font-bold text-lg">MilesFocus</h4>
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 Professional mileage tracking made simple. Built by AI-Focus Technologies.
               </p>
             </div>
 
+            {/* Resources Section */}
             <div>
-              <h5 className="font-semibold mb-4">Resources</h5>
+              <h5 className="font-semibold mb-3 text-foreground">Resources</h5>
               <div className="space-y-2 text-sm">
                 <Link 
                   to="/guide"
                   className="block text-muted-foreground hover:text-primary transition-colors"
                 >
-                  How to Export Timeline Data
+                  Export Timeline Guide
                 </Link>
                 <Link 
                   to="/how-it-works"
                   className="block text-muted-foreground hover:text-primary transition-colors"
                 >
-                  How IRS Mileage Works
+                  IRS Mileage Guide
                 </Link>
                 <Link 
                   to="/faq"
@@ -438,13 +441,14 @@ const Landing = () => {
                   to="/about"
                   className="block text-muted-foreground hover:text-primary transition-colors"
                 >
-                  About MilesFocus
+                  About
                 </Link>
               </div>
             </div>
 
+            {/* Company Section */}
             <div>
-              <h5 className="font-semibold mb-4">Company</h5>
+              <h5 className="font-semibold mb-3 text-foreground">Company</h5>
               <div className="space-y-2 text-sm">
                 <a 
                   href="https://www.ai-focus.org" 
@@ -465,18 +469,18 @@ const Landing = () => {
               </div>
             </div>
 
+            {/* Legal Section */}
             <div>
-              <h5 className="font-semibold mb-4">Legal</h5>
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <p className="text-xs">
-                  MilesFocus provides mileage calculations based on publicly available IRS rates. 
-                  This tool does not provide tax, legal, or financial advice.
-                </p>
-              </div>
+              <h5 className="font-semibold mb-3 text-foreground">Legal</h5>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                MilesFocus provides mileage calculations based on publicly available IRS rates. 
+                This tool does not provide tax, legal, or financial advice.
+              </p>
             </div>
           </div>
 
-          <div className="border-t pt-8 text-center text-sm text-muted-foreground">
+          {/* Copyright */}
+          <div className="border-t pt-6 text-center text-sm text-muted-foreground">
             <p>
               © {new Date().getFullYear()}{" "}
               <a 
