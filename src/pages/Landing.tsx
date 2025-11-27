@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -6,11 +7,20 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { FileUp, BarChart3, FileText, Shield, ArrowRight, CheckCircle, ChevronDown } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { FileUp, BarChart3, FileText, Shield, ArrowRight, CheckCircle, ChevronDown, Menu } from "lucide-react";
 import { Link } from "react-router-dom";
 import logoUrl from "@/assets/ai-focus-logo.png";
 
 const Landing = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
@@ -59,11 +69,74 @@ const Landing = () => {
           
           {/* Mobile menu */}
           <div className="md:hidden">
-            <Link to="/app">
-              <Button size="lg">
-                Get Started <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                <SheetHeader>
+                  <SheetTitle>Navigation</SheetTitle>
+                </SheetHeader>
+                <nav className="flex flex-col gap-4 mt-8">
+                  <Link 
+                    to="/app" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-lg font-semibold hover:text-primary transition-colors"
+                  >
+                    Get Started
+                  </Link>
+                  <div className="border-t pt-4">
+                    <p className="text-sm font-semibold text-muted-foreground mb-3">Resources</p>
+                    <div className="flex flex-col gap-3 pl-3">
+                      <Link 
+                        to="/how-it-works" 
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="text-base hover:text-primary transition-colors"
+                      >
+                        How IRS Mileage Works
+                      </Link>
+                      <Link 
+                        to="/faq" 
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="text-base hover:text-primary transition-colors"
+                      >
+                        FAQ
+                      </Link>
+                      <Link 
+                        to="/about" 
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="text-base hover:text-primary transition-colors"
+                      >
+                        About MilesFocus
+                      </Link>
+                    </div>
+                  </div>
+                  <div className="border-t pt-4">
+                    <p className="text-sm font-semibold text-muted-foreground mb-3">Company</p>
+                    <div className="flex flex-col gap-3 pl-3">
+                      <a 
+                        href="https://www.ai-focus.org" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-base hover:text-primary transition-colors"
+                      >
+                        AI-Focus Technologies
+                      </a>
+                      <a 
+                        href="https://www.sujitg.com" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-base hover:text-primary transition-colors"
+                      >
+                        About the Developer
+                      </a>
+                    </div>
+                  </div>
+                </nav>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </header>
