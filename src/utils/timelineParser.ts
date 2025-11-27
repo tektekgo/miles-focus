@@ -21,9 +21,10 @@ async function reverseGeocode(coordString: string): Promise<string> {
   }
 
   try {
-    // Parse coordinate string (format may vary, handle common formats)
-    const latLngMatch = coordString.match(/(-?\d+\.?\d*)[,\s]+(-?\d+\.?\d*)/);
+    // Parse coordinate string (format: "geo:lat,lon")
+    const latLngMatch = coordString.match(/geo:(-?\d+\.?\d*),(-?\d+\.?\d*)/);
     if (!latLngMatch) {
+      console.warn('Could not parse coordinate:', coordString);
       return coordString; // Return original if can't parse
     }
 
@@ -42,6 +43,7 @@ async function reverseGeocode(coordString: string): Promise<string> {
     );
 
     if (!response.ok) {
+      console.warn('Geocoding API error:', response.status);
       return coordString;
     }
 
@@ -85,6 +87,8 @@ function calculateDuration(start: string, end: string): number {
 export async function parseGoogleTimeline(jsonData: GoogleTimelineActivity[]): Promise<NormalizedTrip[]> {
   const trips: NormalizedTrip[] = [];
   
+  console.log('Parsing timeline data, total items:', jsonData.length);
+  
   // First pass: create trips with coordinates
   jsonData.forEach((item, index) => {
     if (isDrivingActivity(item) && item.activity) {
@@ -113,15 +117,19 @@ export async function parseGoogleTimeline(jsonData: GoogleTimelineActivity[]): P
     }
   });
   
+  console.log('Found driving trips:', trips.length);
+  
   // Sort by date (newest first)
   trips.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   
   // Second pass: geocode addresses (async)
+  console.log('Starting geocoding...');
   for (const trip of trips) {
     trip.startAddress = await reverseGeocode(trip.startCoord);
     trip.endAddress = await reverseGeocode(trip.endCoord);
   }
   
+  console.log('Geocoding complete, returning trips');
   return trips;
 }
 
