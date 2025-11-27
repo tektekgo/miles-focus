@@ -43,6 +43,11 @@ const Landing = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 bg-background z-50">
                 <DropdownMenuItem asChild>
+                  <Link to="/guide" className="cursor-pointer">
+                    How to Export Timeline Data
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link to="/how-it-works" className="cursor-pointer">
                     How IRS Mileage Works
                   </Link>
@@ -91,6 +96,14 @@ const Landing = () => {
                   <div className="border-t pt-4 animate-fade-in" style={{ animationDelay: "0.2s" }}>
                     <p className="text-sm font-semibold text-muted-foreground mb-3">Resources</p>
                     <div className="flex flex-col gap-3 pl-3">
+                      <Link 
+                        to="/guide" 
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="text-base hover:text-primary transition-all duration-300 animate-fade-in hover:translate-x-1"
+                        style={{ animationDelay: "0.25s" }}
+                      >
+                        How to Export Timeline Data
+                      </Link>
                       <Link 
                         to="/how-it-works" 
                         onClick={() => setMobileMenuOpen(false)}
@@ -365,6 +378,12 @@ const Landing = () => {
             <div>
               <h5 className="font-semibold mb-4">Resources</h5>
               <div className="space-y-2 text-sm">
+                <Link 
+                  to="/guide"
+                  className="block text-muted-foreground hover:text-primary transition-colors"
+                >
+                  How to Export Timeline Data
+                </Link>
                 <Link 
                   to="/how-it-works"
                   className="block text-muted-foreground hover:text-primary transition-colors"
