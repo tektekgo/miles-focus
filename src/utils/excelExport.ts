@@ -1,12 +1,26 @@
 import * as XLSX from "xlsx";
-import { NormalizedTrip, MonthlySummary } from "@/types/trip";
+import { NormalizedTrip, MonthlySummary, TripPurpose } from "@/types/trip";
 
-export function exportToExcel(trips: NormalizedTrip[], summaries: MonthlySummary[]) {
+export function exportToExcel(
+  trips: NormalizedTrip[], 
+  summaries: MonthlySummary[], 
+  month: string = "", 
+  purposes: TripPurpose[] = ["Business", "Personal", "Medical", "Charitable", "Other", "Unassigned"]
+) {
+  // Filter trips by month and purposes
+  let filteredTrips = trips;
+  
+  if (month) {
+    filteredTrips = filteredTrips.filter(t => t.date.startsWith(month));
+  }
+  
+  filteredTrips = filteredTrips.filter(t => purposes.includes(t.purpose));
+  
   // Create a new workbook
   const wb = XLSX.utils.book_new();
   
-  // Sheet 1: All Trips
-  const tripsData = trips.map(trip => ({
+  // Sheet 1: Filtered Trips
+  const tripsData = filteredTrips.map(trip => ({
     Date: trip.date,
     "Start Time": trip.startTimeLocal,
     "End Time": trip.endTimeLocal,

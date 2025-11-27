@@ -1,8 +1,13 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { NormalizedTrip, MonthlySummary } from "@/types/trip";
+import { NormalizedTrip, MonthlySummary, TripPurpose } from "@/types/trip";
 
-export function exportToPDF(trips: NormalizedTrip[], summaries: MonthlySummary[], month: string) {
+export function exportToPDF(
+  trips: NormalizedTrip[], 
+  summaries: MonthlySummary[], 
+  month: string,
+  purposes: TripPurpose[] = ["Business", "Personal", "Medical", "Charitable", "Other", "Unassigned"]
+) {
   const doc = new jsPDF();
   
   // AI-Focus brand colors
@@ -27,11 +32,13 @@ export function exportToPDF(trips: NormalizedTrip[], summaries: MonthlySummary[]
   const monthDisplay = month || "All Months";
   doc.text(`Mileage Log - ${monthDisplay}`, 15, 45);
   
-  // Filter trips by month if specified
+  // Filter trips by month and purposes
   let filteredTrips = trips;
   if (month && month !== "all") {
-    filteredTrips = trips.filter(t => t.date.startsWith(month));
+    filteredTrips = filteredTrips.filter(t => t.date.startsWith(month));
   }
+  
+  filteredTrips = filteredTrips.filter(t => purposes.includes(t.purpose));
   
   // Get summary for this month
   const summary = summaries.find(s => s.month === month) || {
