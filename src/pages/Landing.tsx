@@ -32,9 +32,9 @@ const Landing = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b bg-card/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-6 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-6">
             <img src={logoUrl} alt="AI-Focus Logo" className="h-24 w-24" />
@@ -227,11 +227,11 @@ const Landing = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4">
+      <section className="py-20 px-4 bg-card/50">
         <div className="container mx-auto max-w-6xl">
           <h3 className="text-3xl font-bold text-center mb-12">Why Choose MilesFocus?</h3>
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="border-primary/20">
+            <Card className="border-primary/20 shadow-elevated hover:shadow-glow transition-shadow duration-300 bg-card">
               <CardHeader>
                 <FileUp className="h-12 w-12 text-primary mb-4" />
                 <CardTitle>Simple Upload</CardTitle>
@@ -241,7 +241,7 @@ const Landing = () => {
               </CardHeader>
             </Card>
 
-            <Card className="border-primary/20">
+            <Card className="border-primary/20 shadow-elevated hover:shadow-glow transition-shadow duration-300 bg-card">
               <CardHeader>
                 <BarChart3 className="h-12 w-12 text-primary mb-4" />
                 <CardTitle>Smart Categorization</CardTitle>
@@ -251,7 +251,7 @@ const Landing = () => {
               </CardHeader>
             </Card>
 
-            <Card className="border-primary/20">
+            <Card className="border-primary/20 shadow-elevated hover:shadow-glow transition-shadow duration-300 bg-card">
               <CardHeader>
                 <FileText className="h-12 w-12 text-primary mb-4" />
                 <CardTitle>Professional Reports</CardTitle>
@@ -321,11 +321,11 @@ const Landing = () => {
       </section>
 
       {/* Key Features */}
-      <section className="py-20 px-4">
+      <section className="py-20 px-4 bg-gradient-to-br from-primary-light/50 to-accent-light/30">
         <div className="container mx-auto max-w-4xl">
           <h3 className="text-3xl font-bold text-center mb-12">Built for Tax Season</h3>
           <div className="grid md:grid-cols-2 gap-6">
-            <Card>
+            <Card className="shadow-elevated bg-card/90 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-primary" />
@@ -339,7 +339,7 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="shadow-elevated bg-card/90 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-primary" />
@@ -353,7 +353,7 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="shadow-elevated bg-card/90 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-primary" />
@@ -367,7 +367,7 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="shadow-elevated bg-card/90 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-primary" />
@@ -393,7 +393,7 @@ const Landing = () => {
             Start creating professional, IRS-ready mileage reports in minutes. Completely free to use.
           </p>
           <Link to="/app">
-            <Button size="lg" className="text-lg px-12">
+            <Button size="lg" className="text-lg px-12 shadow-glow">
               Get Started Now <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
@@ -401,7 +401,7 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-muted/30 border-t py-10 px-4">
+      <footer className="bg-card/50 border-t py-10 px-4 backdrop-blur-sm">
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-6">
             {/* Brand Section */}

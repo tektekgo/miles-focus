@@ -16,9 +16,9 @@ import logoUrl from "@/assets/ai-focus-logo.png";
 
 const Guide = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b bg-card/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-6 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-6">
             <img src={logoUrl} alt="AI-Focus Logo" className="h-16 w-16" />
@@ -34,7 +34,7 @@ const Guide = () => {
       </header>
 
       {/* Content */}
-      <main className="flex-1 container mx-auto px-4 py-12 max-w-5xl">
+      <main className="flex-1 container mx-auto px-4 py-12 max-w-5xl relative">
         <Link to="/app" className="inline-flex items-center text-primary hover:underline mb-6">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to App
@@ -85,7 +85,7 @@ const Guide = () => {
               Works on Android and iPhone and gives the cleanest export.
             </p>
 
-            <Card>
+            <Card className="shadow-elevated bg-card">
               <CardHeader>
                 <CardTitle>Steps:</CardTitle>
               </CardHeader>
@@ -147,7 +147,7 @@ const Guide = () => {
               in which case this method downloads only settings.
             </p>
 
-            <Card>
+            <Card className="shadow-elevated bg-card">
               <CardHeader>
                 <CardTitle>Steps:</CardTitle>
               </CardHeader>
@@ -158,7 +158,7 @@ const Guide = () => {
                     <span className="pt-1">
                       Go to:{" "}
                       <a 
-                        href="https://takeout.google.com" 
+                        href="https://takeout.google.com"
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-primary hover:underline font-semibold"
@@ -339,7 +339,7 @@ const Guide = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-muted/30 border-t py-8 px-4 mt-12">
+      <footer className="bg-card/50 border-t py-8 px-4 mt-12 backdrop-blur-sm">
         <div className="container mx-auto text-center text-sm text-muted-foreground">
           <p>
             © {new Date().getFullYear()}{" "}
