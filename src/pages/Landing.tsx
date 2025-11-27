@@ -25,7 +25,7 @@ import {
 import { FileUp, BarChart3, FileText, Shield, ArrowRight, CheckCircle, ChevronDown, Menu, Download, PlayCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import logoUrl from "@/assets/ai-focus-logo.png";
-import logoNoText from "@/assets/ai-focus-logo-notext.png";
+import milesFocusLogo from "@/assets/miles-focus-logo-notext.png";
 import { DemoViewer } from "@/components/DemoViewer";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -410,7 +410,7 @@ const Landing = () => {
             {/* Brand Section */}
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <img src={logoNoText} alt="AI-Focus Logo" className="h-10 w-10" />
+                <img src={milesFocusLogo} alt="MilesFocus Logo" className="h-12 w-12" />
                 <h4 className="font-bold text-lg">MilesFocus</h4>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
