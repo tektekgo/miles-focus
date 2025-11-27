@@ -241,6 +241,30 @@ const Landing = () => {
             </div>
 
             <div>
+              <h5 className="font-semibold mb-4">Resources</h5>
+              <div className="space-y-2 text-sm">
+                <Link 
+                  to="/how-it-works"
+                  className="block text-muted-foreground hover:text-primary transition-colors"
+                >
+                  How IRS Mileage Works
+                </Link>
+                <Link 
+                  to="/faq"
+                  className="block text-muted-foreground hover:text-primary transition-colors"
+                >
+                  FAQ
+                </Link>
+                <Link 
+                  to="/about"
+                  className="block text-muted-foreground hover:text-primary transition-colors"
+                >
+                  About MilesFocus
+                </Link>
+              </div>
+            </div>
+
+            <div>
               <h5 className="font-semibold mb-4">Company</h5>
               <div className="space-y-2 text-sm">
                 <a 
