@@ -45,16 +45,16 @@ async function reverseGeocode(coordString: string): Promise<string> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
     
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`,
-      {
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'MilesFocus/1.0'
-        },
-        signal: controller.signal,
-      }
-    );
+    // Use CORS proxy to avoid CORS issues with Nominatim
+    const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`;
+    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(nominatimUrl)}`;
+    
+    const response = await fetch(proxyUrl, {
+      headers: {
+        'Accept': 'application/json',
+      },
+      signal: controller.signal,
+    });
     
     clearTimeout(timeoutId);
 
