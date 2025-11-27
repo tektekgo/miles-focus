@@ -1,6 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileUp, BarChart3, FileText, Shield, ArrowRight, CheckCircle } from "lucide-react";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { FileUp, BarChart3, FileText, Shield, ArrowRight, CheckCircle, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import logoUrl from "@/assets/ai-focus-logo.png";
 
@@ -10,18 +16,55 @@ const Landing = () => {
       {/* Header */}
       <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-6 flex items-center justify-between">
-          <div className="flex items-center gap-6">
+          <Link to="/" className="flex items-center gap-6">
             <img src={logoUrl} alt="AI-Focus Logo" className="h-24 w-24" />
             <div>
               <h1 className="text-4xl font-bold text-primary">MilesFocus</h1>
               <p className="text-base text-muted-foreground">by AI-Focus Technologies</p>
             </div>
-          </div>
-          <Link to="/app">
-            <Button size="lg">
-              Get Started <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
           </Link>
+          
+          <nav className="hidden md:flex items-center gap-6">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="gap-1">
+                  Resources <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 bg-background z-50">
+                <DropdownMenuItem asChild>
+                  <Link to="/how-it-works" className="cursor-pointer">
+                    How IRS Mileage Works
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/faq" className="cursor-pointer">
+                    FAQ
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/about" className="cursor-pointer">
+                    About MilesFocus
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
+            <Link to="/app">
+              <Button size="lg">
+                Get Started <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          </nav>
+          
+          {/* Mobile menu */}
+          <div className="md:hidden">
+            <Link to="/app">
+              <Button size="lg">
+                Get Started <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 
