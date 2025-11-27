@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import logo from "@/assets/ai-focus-logo.png";
 
 export const Header = () => {
   return (
-    <header className="border-b border-primary/10 sticky top-0 z-50 shadow-md" style={{ backgroundColor: 'hsl(208, 57%, 21%)' }}>
+    <header className="border-b border-white/10 sticky top-0 z-50 shadow-md" style={{ backgroundColor: 'hsl(208, 57%, 21%)' }}>
       <div className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
           {/* Mobile back button */}
@@ -24,8 +25,12 @@ export const Header = () => {
             </div>
           </Link>
 
-          {/* Spacer for mobile to keep logo centered */}
-          <div className="md:hidden w-10"></div>
+          {/* Theme toggle */}
+          <div className="flex items-center gap-2">
+            <ThemeToggle variant="header" />
+            {/* Spacer for mobile to keep logo centered */}
+            <div className="md:hidden w-2"></div>
+          </div>
         </div>
       </div>
     </header>
