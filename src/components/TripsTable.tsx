@@ -32,6 +32,8 @@ export const TripsTable = ({ trips, onTripUpdate, selectedMonth }: TripsTablePro
           <TableHeader>
             <TableRow className="bg-primary hover:bg-primary">
               <TableHead className="text-primary-foreground font-semibold">Date</TableHead>
+              <TableHead className="text-primary-foreground font-semibold">From</TableHead>
+              <TableHead className="text-primary-foreground font-semibold">To</TableHead>
               <TableHead className="text-primary-foreground font-semibold">Start Time</TableHead>
               <TableHead className="text-primary-foreground font-semibold">End Time</TableHead>
               <TableHead className="text-primary-foreground font-semibold text-right">Miles</TableHead>
@@ -43,6 +45,12 @@ export const TripsTable = ({ trips, onTripUpdate, selectedMonth }: TripsTablePro
             {filteredTrips.map((trip, index) => (
               <TableRow key={trip.id} className={index % 2 === 0 ? "bg-background" : "bg-muted/30"}>
                 <TableCell className="font-medium">{trip.date}</TableCell>
+                <TableCell className="text-sm text-muted-foreground max-w-[150px] truncate" title={trip.startCoord}>
+                  {trip.startCoord}
+                </TableCell>
+                <TableCell className="text-sm text-muted-foreground max-w-[150px] truncate" title={trip.endCoord}>
+                  {trip.endCoord}
+                </TableCell>
                 <TableCell>{trip.startTimeLocal}</TableCell>
                 <TableCell>{trip.endTimeLocal}</TableCell>
                 <TableCell className="text-right font-mono">{trip.distanceMiles.toFixed(2)}</TableCell>
@@ -77,7 +85,7 @@ export const TripsTable = ({ trips, onTripUpdate, selectedMonth }: TripsTablePro
             ))}
             {filteredTrips.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                   No trips found for the selected month.
                 </TableCell>
               </TableRow>
