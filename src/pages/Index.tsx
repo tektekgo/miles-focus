@@ -3,6 +3,9 @@ import { Header } from "@/components/Header";
 import { FileUpload } from "@/components/FileUpload";
 import { TripsTable } from "@/components/TripsTable";
 import { MonthlySummary } from "@/components/MonthlySummary";
+import { IRSRatesPanel } from "@/components/IRSRatesPanel";
+import { EstimatedDeduction } from "@/components/EstimatedDeduction";
+import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -261,6 +264,16 @@ const Index = () => {
 
             <MonthlySummary summaries={summaries} selectedMonth={selectedMonth} />
             
+            <IRSRatesPanel />
+            
+            <EstimatedDeduction 
+              businessMiles={
+                selectedMonth === "all" 
+                  ? summaries.reduce((sum, s) => sum + s.businessMiles, 0)
+                  : summaries.find(s => s.month === selectedMonth)?.businessMiles || 0
+              }
+            />
+            
             <TripsTable 
               trips={trips} 
               onTripUpdate={handleTripUpdate}
@@ -284,12 +297,7 @@ const Index = () => {
         )}
       </main>
 
-      <footer className="border-t py-6 bg-card">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2025 AI-Focus Technologies • MilesFocus</p>
-          <p className="mt-1">Your data is processed locally and never leaves your device.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
