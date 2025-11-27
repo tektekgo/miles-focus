@@ -198,6 +198,14 @@ export async function parseGoogleTimeline(
 ): Promise<NormalizedTrip[]> {
   const trips: NormalizedTrip[] = [];
   
+  // Debug: Check if LocationIQ key is available
+  const locationIQKey = import.meta.env.VITE_LOCATIONIQ_API_KEY;
+  console.log('=== GEOCODING DEBUG ===');
+  console.log('LocationIQ Key Present:', !!locationIQKey);
+  console.log('Key first 4 chars:', locationIQKey ? locationIQKey.substring(0, 4) + '...' : 'NONE');
+  console.log('Will use:', locationIQKey ? 'LocationIQ API' : 'Nominatim (fallback)');
+  console.log('=======================');
+  
   console.log('Parsing timeline data, total items:', jsonData.length);
   
   // First pass: create trips with coordinates
@@ -242,8 +250,8 @@ export async function parseGoogleTimeline(
   
   // Use batch geocoding with concurrency
   let processedCount = 0;
-  const locationIQKey = import.meta.env.VITE_LOCATIONIQ_API_KEY;
-  const concurrency = locationIQKey ? 2 : 1; // LocationIQ can handle more concurrent requests
+  const hasLocationIQ = !!import.meta.env.VITE_LOCATIONIQ_API_KEY;
+  const concurrency = hasLocationIQ ? 2 : 1; // LocationIQ can handle more concurrent requests
   
   // Deduplicate and get unique coords
   const uniqueCoords = [...new Set(allCoords.map(c => normalizeCoordString(c)))];
