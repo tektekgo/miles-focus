@@ -32,6 +32,8 @@ async function reverseGeocode(coordString: string): Promise<string> {
     return addressCache.get(normalizedCoord)!;
   }
 
+  const locationIQKey = import.meta.env.VITE_LOCATIONIQ_API_KEY;
+  
   try {
     // Parse coordinate string (format: "geo:lat,lon")
     const latLngMatch = coordString.match(/geo:(-?\d+\.?\d*),(-?\d+\.?\d*)/);
@@ -42,22 +44,23 @@ async function reverseGeocode(coordString: string): Promise<string> {
 
     const [, lat, lon] = latLngMatch;
     
-    // Add delay to respect rate limits (1 req/sec)
-    await new Promise(resolve => setTimeout(resolve, 1050));
+    // LocationIQ allows 2 requests/second - use 550ms delay for safety
+    await new Promise(resolve => setTimeout(resolve, 550));
     
-    // Use Nominatim with shorter timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
     
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`,
-      {
-        headers: {
-          'Accept': 'application/json',
-        },
-        signal: controller.signal,
-      }
-    );
+    // Use LocationIQ API (faster and more reliable than Nominatim)
+    const apiUrl = locationIQKey 
+      ? `https://us1.locationiq.com/v1/reverse?key=${locationIQKey}&lat=${lat}&lon=${lon}&format=json&addressdetails=1`
+      : `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`;
+    
+    const response = await fetch(apiUrl, {
+      headers: {
+        'Accept': 'application/json',
+      },
+      signal: controller.signal,
+    });
     
     clearTimeout(timeoutId);
 
