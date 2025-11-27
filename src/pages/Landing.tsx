@@ -40,8 +40,8 @@ const Landing = () => {
           <Link to="/" className="flex items-center gap-4 md:gap-6 hover:opacity-90 transition-opacity">
             <img src={milesFocusLogo} alt="MilesFocus" className="h-12 md:h-16 w-auto" />
             <div>
-              <h1 className="text-4xl font-bold text-white">MilesFocus</h1>
-              <p className="text-base text-white/80">by AI-Focus Technologies</p>
+              <h1 className="text-4xl font-bold" style={{ color: '#FFFFFF' }}>MilesFocus</h1>
+              <p className="text-base" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>by AI-Focus Technologies</p>
             </div>
           </Link>
           
