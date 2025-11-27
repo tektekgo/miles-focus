@@ -77,34 +77,38 @@ export function exportToPDF(trips: NormalizedTrip[], summaries: MonthlySummary[]
     trip.date,
     trip.startTimeLocal,
     trip.endTimeLocal,
+    trip.startAddress,
+    trip.endAddress,
     trip.distanceMiles.toFixed(2),
     trip.notes || "-",
   ]);
   
   autoTable(doc, {
     startY: yPos + 5,
-    head: [["Date", "Start Time", "End Time", "Miles", "Notes"]],
+    head: [["Date", "Start Time", "End Time", "From", "To", "Miles", "Notes"]],
     body: tableData,
     theme: "striped",
     headStyles: {
       fillColor: navyBlue,
       textColor: [255, 255, 255],
-      fontSize: 10,
+      fontSize: 9,
       fontStyle: "bold",
     },
     alternateRowStyles: {
       fillColor: [245, 247, 250],
     },
     styles: {
-      fontSize: 9,
+      fontSize: 8,
       textColor: darkGrey,
     },
     columnStyles: {
-      0: { cellWidth: 30 },
-      1: { cellWidth: 30 },
-      2: { cellWidth: 30 },
-      3: { cellWidth: 25 },
-      4: { cellWidth: 'auto' },
+      0: { cellWidth: 22 },
+      1: { cellWidth: 20 },
+      2: { cellWidth: 20 },
+      3: { cellWidth: 35 },
+      4: { cellWidth: 35 },
+      5: { cellWidth: 18 },
+      6: { cellWidth: 'auto' },
     },
   });
   
