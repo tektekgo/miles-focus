@@ -6,9 +6,9 @@ import logoUrl from "@/assets/ai-focus-logo.png";
 
 const HowItWorks = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b bg-card/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-6 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-6">
             <img src={logoUrl} alt="AI-Focus Logo" className="h-16 w-16" />
@@ -270,7 +270,7 @@ const HowItWorks = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-muted/30 border-t py-8 px-4 mt-12">
+      <footer className="bg-card/50 border-t py-8 px-4 mt-12 backdrop-blur-sm">
         <div className="container mx-auto text-center text-sm text-muted-foreground">
           <p>
             © {new Date().getFullYear()}{" "}
