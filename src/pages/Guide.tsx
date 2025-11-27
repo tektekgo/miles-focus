@@ -18,17 +18,17 @@ const Guide = () => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="border-b bg-card/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+      <header className="border-b border-white/10 sticky top-0 z-50 shadow-md" style={{ backgroundColor: 'hsl(208, 57%, 21%)' }}>
         <div className="container mx-auto px-4 py-6 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-6">
+          <Link to="/" className="flex items-center gap-6 hover:opacity-90 transition-opacity">
             <img src={logoUrl} alt="AI-Focus Logo" className="h-16 w-16" />
             <div>
-              <h1 className="text-3xl font-bold text-primary">MilesFocus</h1>
-              <p className="text-sm text-muted-foreground">by AI-Focus Technologies</p>
+              <h1 className="text-3xl font-bold text-white">MilesFocus</h1>
+              <p className="text-sm text-white/80">by AI-Focus Technologies</p>
             </div>
           </Link>
           <Link to="/app">
-            <Button size="lg">Get Started</Button>
+            <Button size="lg" className="bg-white text-primary hover:bg-white/90">Get Started</Button>
           </Link>
         </div>
       </header>
