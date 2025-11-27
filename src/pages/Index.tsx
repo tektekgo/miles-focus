@@ -306,6 +306,7 @@ const Index = () => {
               onTripUpdate={handleTripUpdate}
               selectedMonth={selectedMonth}
               showUnassignedOnly={showUnassignedOnly}
+              onToggleUnassignedOnly={() => setShowUnassignedOnly(!showUnassignedOnly)}
             />
 
             <div className="flex justify-center pt-4">
