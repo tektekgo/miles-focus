@@ -4,6 +4,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { CheckSquare } from "lucide-react";
 
 interface TripsTableProps {
   trips: NormalizedTrip[];
@@ -21,16 +24,95 @@ const purposeOptions: TripPurpose[] = [
 ];
 
 export const TripsTable = ({ trips, onTripUpdate, selectedMonth }: TripsTableProps) => {
+  const [selectedTripIds, setSelectedTripIds] = useState<Set<string>>(new Set());
+  const [bulkPurpose, setBulkPurpose] = useState<TripPurpose>("Business");
+
   const filteredTrips = selectedMonth === "all" 
     ? trips 
     : trips.filter(t => t.date.startsWith(selectedMonth));
 
+  const allSelected = filteredTrips.length > 0 && filteredTrips.every(trip => selectedTripIds.has(trip.id));
+  const someSelected = selectedTripIds.size > 0 && !allSelected;
+
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedTripIds(new Set());
+    } else {
+      setSelectedTripIds(new Set(filteredTrips.map(t => t.id)));
+    }
+  };
+
+  const toggleTripSelection = (tripId: string) => {
+    const newSelected = new Set(selectedTripIds);
+    if (newSelected.has(tripId)) {
+      newSelected.delete(tripId);
+    } else {
+      newSelected.add(tripId);
+    }
+    setSelectedTripIds(newSelected);
+  };
+
+  const handleBulkAssign = () => {
+    selectedTripIds.forEach(tripId => {
+      onTripUpdate(tripId, { purpose: bulkPurpose });
+    });
+    setSelectedTripIds(new Set());
+  };
+
   return (
     <Card className="overflow-hidden">
+      {selectedTripIds.size > 0 && (
+        <div className="bg-primary/10 border-b px-4 py-3 flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-3">
+            <CheckSquare className="h-5 w-5 text-primary" />
+            <span className="font-medium text-foreground">
+              {selectedTripIds.size} trip{selectedTripIds.size !== 1 ? 's' : ''} selected
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-muted-foreground">Assign purpose:</span>
+            <Select value={bulkPurpose} onValueChange={(value) => setBulkPurpose(value as TripPurpose)}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {purposeOptions.map(purpose => (
+                  <SelectItem key={purpose} value={purpose}>
+                    {purpose}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button onClick={handleBulkAssign} size="sm">
+              Apply to Selected
+            </Button>
+            <Button 
+              onClick={() => setSelectedTripIds(new Set())} 
+              variant="ghost" 
+              size="sm"
+            >
+              Clear
+            </Button>
+          </div>
+        </div>
+      )}
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="bg-primary hover:bg-primary">
+              <TableHead className="text-primary-foreground font-semibold w-[50px]">
+                <Checkbox
+                  checked={allSelected}
+                  onCheckedChange={toggleSelectAll}
+                  aria-label="Select all trips"
+                  className="border-primary-foreground data-[state=checked]:bg-primary-foreground data-[state=checked]:text-primary"
+                  ref={(el) => {
+                    if (el) {
+                      (el as any).indeterminate = someSelected;
+                    }
+                  }}
+                />
+              </TableHead>
               <TableHead className="text-primary-foreground font-semibold">Date</TableHead>
               <TableHead className="text-primary-foreground font-semibold">From</TableHead>
               <TableHead className="text-primary-foreground font-semibold">To</TableHead>
@@ -44,6 +126,13 @@ export const TripsTable = ({ trips, onTripUpdate, selectedMonth }: TripsTablePro
           <TableBody>
             {filteredTrips.map((trip, index) => (
               <TableRow key={trip.id} className={index % 2 === 0 ? "bg-background" : "bg-muted/30"}>
+                <TableCell>
+                  <Checkbox
+                    checked={selectedTripIds.has(trip.id)}
+                    onCheckedChange={() => toggleTripSelection(trip.id)}
+                    aria-label={`Select trip on ${trip.date}`}
+                  />
+                </TableCell>
                 <TableCell className="font-medium">{trip.date}</TableCell>
                 <TableCell className="text-sm text-muted-foreground max-w-[200px] truncate" title={trip.startAddress}>
                   {trip.startAddress}
@@ -85,7 +174,7 @@ export const TripsTable = ({ trips, onTripUpdate, selectedMonth }: TripsTablePro
             ))}
             {filteredTrips.length === 0 && (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                   No trips found for the selected month.
                 </TableCell>
               </TableRow>
