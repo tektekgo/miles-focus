@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Download, FileSpreadsheet, FileText, Filter } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Download, FileSpreadsheet, FileText, Filter, AlertCircle } from "lucide-react";
 import { GoogleTimelineActivity, NormalizedTrip, TripPurpose } from "@/types/trip";
 import { parseGoogleTimeline, calculateMonthlySummaries } from "@/utils/timelineParser";
 import { exportToExcel } from "@/utils/excelExport";
@@ -151,6 +152,15 @@ const Index = () => {
                   </div>
                 </div>
               </div>
+            )}
+            
+            {!isGeocoding && (
+              <Alert className="bg-primary/10 border-primary">
+                <AlertCircle className="h-5 w-5 text-primary" />
+                <AlertDescription className="text-base font-medium text-foreground ml-2">
+                  <strong>Important:</strong> Select a purpose for each trip row below. Only trips with assigned purposes will be included in your exports.
+                </AlertDescription>
+              </Alert>
             )}
             
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
