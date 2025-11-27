@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { NormalizedTrip, MonthlySummary, TripPurpose } from "@/types/trip";
-import logoUrl from "@/assets/ai-focus-logo.png";
+import milesFocusLogo from "@/assets/miles-focus-logo-v1-notext.png";
 import { CURRENT_IRS_RATES, calculateDeduction, formatRate, IRSRates } from "@/config/irsRates";
 
 export function exportToPDF(
@@ -26,7 +26,7 @@ export function exportToPDF(
   
   // Add logo image
   try {
-    doc.addImage(logoUrl, 'PNG', 10, 8, 20, 20);
+    doc.addImage(milesFocusLogo, 'PNG', 10, 8, 20, 20);
   } catch (e) {
     console.error('Failed to add logo to PDF:', e);
   }
