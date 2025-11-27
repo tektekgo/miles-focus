@@ -16,18 +16,26 @@ const Index = () => {
   const [rawData, setRawData] = useState<GoogleTimelineActivity[] | null>(null);
   const [trips, setTrips] = useState<NormalizedTrip[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
+  const [isGeocoding, setIsGeocoding] = useState(false);
+  const [geocodingProgress, setGeocodingProgress] = useState({ current: 0, total: 0 });
   const { toast } = useToast();
 
   const handleDataLoaded = async (data: GoogleTimelineActivity[]) => {
     setRawData(data);
+    setIsGeocoding(true);
     
     toast({
       title: "Processing...",
       description: "Extracting trips and geocoding addresses...",
     });
     
-    const parsedTrips = await parseGoogleTimeline(data);
+    const parsedTrips = await parseGoogleTimeline(data, (current, total) => {
+      setGeocodingProgress({ current, total });
+    });
+    
     setTrips(parsedTrips);
+    setIsGeocoding(false);
+    setGeocodingProgress({ current: 0, total: 0 });
     
     toast({
       title: "Trips Extracted!",
@@ -108,6 +116,30 @@ const Index = () => {
           </div>
         ) : (
           <div className="space-y-6">
+            {isGeocoding && (
+              <div className="bg-card border rounded-lg p-6">
+                <div className="flex items-center gap-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-foreground mb-1">
+                      Geocoding Addresses...
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Processing {geocodingProgress.current} of {geocodingProgress.total} addresses
+                    </p>
+                    <div className="mt-2 w-full bg-muted rounded-full h-2">
+                      <div 
+                        className="bg-primary h-2 rounded-full transition-all duration-300"
+                        style={{ 
+                          width: `${geocodingProgress.total > 0 ? (geocodingProgress.current / geocodingProgress.total) * 100 : 0}%` 
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
                 <h2 className="text-2xl font-bold text-foreground">Your Trips</h2>

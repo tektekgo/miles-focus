@@ -84,7 +84,10 @@ function calculateDuration(start: string, end: string): number {
   return Math.round((endTime - startTime) / (1000 * 60)); // minutes
 }
 
-export async function parseGoogleTimeline(jsonData: GoogleTimelineActivity[]): Promise<NormalizedTrip[]> {
+export async function parseGoogleTimeline(
+  jsonData: GoogleTimelineActivity[], 
+  onProgress?: (current: number, total: number) => void
+): Promise<NormalizedTrip[]> {
   const trips: NormalizedTrip[] = [];
   
   console.log('Parsing timeline data, total items:', jsonData.length);
@@ -124,9 +127,17 @@ export async function parseGoogleTimeline(jsonData: GoogleTimelineActivity[]): P
   
   // Second pass: geocode addresses (async)
   console.log('Starting geocoding...');
+  const totalAddresses = trips.length * 2; // start + end for each trip
+  let processedAddresses = 0;
+  
   for (const trip of trips) {
     trip.startAddress = await reverseGeocode(trip.startCoord);
+    processedAddresses++;
+    if (onProgress) onProgress(processedAddresses, totalAddresses);
+    
     trip.endAddress = await reverseGeocode(trip.endCoord);
+    processedAddresses++;
+    if (onProgress) onProgress(processedAddresses, totalAddresses);
   }
   
   console.log('Geocoding complete, returning trips');
