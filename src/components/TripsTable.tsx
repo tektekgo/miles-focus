@@ -24,6 +24,17 @@ const purposeOptions: TripPurpose[] = [
   "Other",
 ];
 
+const getPurposeColor = (purpose: TripPurpose) => {
+  switch (purpose) {
+    case "Business": return "bg-blue-500/10 text-blue-700 border-blue-300";
+    case "Medical": return "bg-green-500/10 text-green-700 border-green-300";
+    case "Charitable": return "bg-purple-500/10 text-purple-700 border-purple-300";
+    case "Personal": return "bg-gray-500/10 text-gray-700 border-gray-300";
+    case "Other": return "bg-orange-500/10 text-orange-700 border-orange-300";
+    default: return "bg-yellow-500/10 text-yellow-700 border-yellow-300"; // Unassigned
+  }
+};
+
 export const TripsTable = ({ trips, onTripUpdate, selectedMonth, showUnassignedOnly = false }: TripsTableProps) => {
   const [selectedTripIds, setSelectedTripIds] = useState<Set<string>>(new Set());
   const [bulkPurpose, setBulkPurpose] = useState<TripPurpose>("Business");
@@ -155,10 +166,10 @@ export const TripsTable = ({ trips, onTripUpdate, selectedMonth, showUnassignedO
                       onTripUpdate(trip.id, { purpose: value as TripPurpose })
                     }
                   >
-                    <SelectTrigger className="w-[140px]">
+                    <SelectTrigger className={`w-[140px] ${getPurposeColor(trip.purpose)}`}>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-background">
                       {purposeOptions.map(purpose => (
                         <SelectItem key={purpose} value={purpose}>
                           {purpose}
