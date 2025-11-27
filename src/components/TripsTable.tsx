@@ -12,6 +12,7 @@ interface TripsTableProps {
   trips: NormalizedTrip[];
   onTripUpdate: (tripId: string, updates: Partial<NormalizedTrip>) => void;
   selectedMonth: string;
+  showUnassignedOnly?: boolean;
 }
 
 const purposeOptions: TripPurpose[] = [
@@ -23,13 +24,17 @@ const purposeOptions: TripPurpose[] = [
   "Other",
 ];
 
-export const TripsTable = ({ trips, onTripUpdate, selectedMonth }: TripsTableProps) => {
+export const TripsTable = ({ trips, onTripUpdate, selectedMonth, showUnassignedOnly = false }: TripsTableProps) => {
   const [selectedTripIds, setSelectedTripIds] = useState<Set<string>>(new Set());
   const [bulkPurpose, setBulkPurpose] = useState<TripPurpose>("Business");
 
-  const filteredTrips = selectedMonth === "all" 
+  let filteredTrips = selectedMonth === "all" 
     ? trips 
     : trips.filter(t => t.date.startsWith(selectedMonth));
+  
+  if (showUnassignedOnly) {
+    filteredTrips = filteredTrips.filter(t => t.purpose === "Unassigned");
+  }
 
   const allSelected = filteredTrips.length > 0 && filteredTrips.every(trip => selectedTripIds.has(trip.id));
   const someSelected = selectedTripIds.size > 0 && !allSelected;
