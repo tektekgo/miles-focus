@@ -34,20 +34,20 @@ const Landing = () => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="border-b bg-card/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+      <header className="border-b border-white/10 sticky top-0 z-50 shadow-md" style={{ backgroundColor: 'hsl(208, 57%, 21%)' }}>
         <div className="container mx-auto px-4 py-6 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-6">
+          <Link to="/" className="flex items-center gap-6 hover:opacity-90 transition-opacity">
             <img src={logoUrl} alt="AI-Focus Logo" className="h-24 w-24" />
             <div>
-              <h1 className="text-4xl font-bold text-primary">MilesFocus</h1>
-              <p className="text-base text-muted-foreground">by AI-Focus Technologies</p>
+              <h1 className="text-4xl font-bold text-white">MilesFocus</h1>
+              <p className="text-base text-white/80">by AI-Focus Technologies</p>
             </div>
           </Link>
           
           <nav className="hidden md:flex items-center gap-6">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="gap-1">
+                <Button variant="ghost" className="gap-1 text-white hover:bg-white/10 hover:text-white">
                   Resources <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -76,7 +76,7 @@ const Landing = () => {
             </DropdownMenu>
             
             <Link to="/app">
-              <Button size="lg">
+              <Button size="lg" className="bg-white text-primary hover:bg-white/90">
                 Get Started <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
@@ -86,7 +86,7 @@ const Landing = () => {
           <div className="md:hidden">
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="hover-scale">
+                <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
