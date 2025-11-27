@@ -263,7 +263,7 @@ export async function parseGoogleTimeline(
     
     // Add delay between batches
     if (i > 0) {
-      const delay = locationIQKey ? 600 : 1100;
+      const delay = hasLocationIQ ? 600 : 1100;
       await new Promise(resolve => setTimeout(resolve, delay));
     }
     
