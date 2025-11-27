@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { NormalizedTrip, MonthlySummary, TripPurpose } from "@/types/trip";
+import logoUrl from "@/assets/ai-focus-logo.png";
 
 export function exportToPDF(
   trips: NormalizedTrip[], 
@@ -15,22 +16,29 @@ export function exportToPDF(
   const grey: [number, number, number] = [145, 156, 167]; // #919CA7
   const darkGrey: [number, number, number] = [64, 64, 64]; // #404040
   
-  // Header with logo placeholder
+  // Header with logo and branding
   doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2]);
-  doc.rect(0, 0, 220, 30, 'F');
+  doc.rect(0, 0, 220, 35, 'F');
+  
+  // Add logo image
+  try {
+    doc.addImage(logoUrl, 'PNG', 10, 8, 20, 20);
+  } catch (e) {
+    console.error('Failed to add logo to PDF:', e);
+  }
   
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(20);
-  doc.text("MilesFocus", 15, 15);
+  doc.setFontSize(22);
+  doc.text("MilesFocus", 35, 18);
   
   doc.setFontSize(10);
-  doc.text("AI-Focus Technologies", 15, 22);
+  doc.text("AI-Focus Technologies", 35, 25);
   
   // Title
   doc.setTextColor(navyBlue[0], navyBlue[1], navyBlue[2]);
   doc.setFontSize(16);
   const monthDisplay = month || "All Months";
-  doc.text(`Mileage Log - ${monthDisplay}`, 15, 45);
+  doc.text(`Mileage Log - ${monthDisplay}`, 15, 48);
   
   // Filter trips by month and purposes
   let filteredTrips = trips;
@@ -53,11 +61,11 @@ export function exportToPDF(
   // Monthly Summary Box
   doc.setFontSize(12);
   doc.setTextColor(navyBlue[0], navyBlue[1], navyBlue[2]);
-  doc.text("Monthly Summary", 15, 55);
+  doc.text("Monthly Summary", 15, 58);
   
   doc.setFontSize(10);
   doc.setTextColor(darkGrey[0], darkGrey[1], darkGrey[2]);
-  let yPos = 62;
+  let yPos = 65;
   doc.text(`Business Miles: ${summary.businessMiles.toFixed(2)}`, 15, yPos);
   yPos += 6;
   doc.text(`Personal Miles: ${summary.personalMiles.toFixed(2)}`, 15, yPos);
