@@ -45,11 +45,11 @@ export const TripsTable = ({ trips, onTripUpdate, selectedMonth }: TripsTablePro
             {filteredTrips.map((trip, index) => (
               <TableRow key={trip.id} className={index % 2 === 0 ? "bg-background" : "bg-muted/30"}>
                 <TableCell className="font-medium">{trip.date}</TableCell>
-                <TableCell className="text-sm text-muted-foreground max-w-[150px] truncate" title={trip.startCoord}>
-                  {trip.startCoord}
+                <TableCell className="text-sm text-muted-foreground max-w-[200px] truncate" title={trip.startAddress}>
+                  {trip.startAddress}
                 </TableCell>
-                <TableCell className="text-sm text-muted-foreground max-w-[150px] truncate" title={trip.endCoord}>
-                  {trip.endCoord}
+                <TableCell className="text-sm text-muted-foreground max-w-[200px] truncate" title={trip.endAddress}>
+                  {trip.endAddress}
                 </TableCell>
                 <TableCell>{trip.startTimeLocal}</TableCell>
                 <TableCell>{trip.endTimeLocal}</TableCell>
