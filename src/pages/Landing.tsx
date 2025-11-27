@@ -14,7 +14,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { FileUp, BarChart3, FileText, Shield, ArrowRight, CheckCircle, ChevronDown, Menu } from "lucide-react";
+import { FileUp, BarChart3, FileText, Shield, ArrowRight, CheckCircle, ChevronDown, Menu, Download } from "lucide-react";
 import { Link } from "react-router-dom";
 import logoUrl from "@/assets/ai-focus-logo.png";
 
@@ -163,6 +163,23 @@ const Landing = () => {
       {/* Hero Section */}
       <section className="py-20 px-4 bg-gradient-to-b from-primary/5 to-background">
         <div className="container mx-auto max-w-5xl text-center">
+          {/* First-time user banner */}
+          <div className="mb-8 inline-block">
+            <Link to="/guide">
+              <div className="bg-primary/10 border-2 border-primary/30 rounded-lg p-4 hover:bg-primary/15 transition-all duration-300 hover:scale-105 cursor-pointer">
+                <div className="flex items-center gap-3 justify-center">
+                  <Download className="h-6 w-6 text-primary animate-bounce" />
+                  <div className="text-left">
+                    <p className="text-sm font-semibold text-primary">New to MilesFocus?</p>
+                    <p className="text-sm text-foreground">
+                      Learn how to export your Timeline data in 3 easy steps →
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </div>
+
           <h2 className="text-5xl font-bold text-foreground mb-6">
             Turn Your Google Timeline Into
             <br />
