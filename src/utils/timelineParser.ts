@@ -44,13 +44,10 @@ async function reverseGeocode(coordString: string): Promise<string> {
 
     const [, lat, lon] = latLngMatch;
     
-    // LocationIQ allows 2 requests/second - use 550ms delay for safety
-    await new Promise(resolve => setTimeout(resolve, 550));
-    
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
     
-    // Use LocationIQ API (faster and more reliable than Nominatim)
+    // Use LocationIQ API if key available, otherwise Nominatim
     const apiUrl = locationIQKey 
       ? `https://us1.locationiq.com/v1/reverse?key=${locationIQKey}&lat=${lat}&lon=${lon}&format=json&addressdetails=1`
       : `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`;
@@ -114,6 +111,49 @@ async function reverseGeocode(coordString: string): Promise<string> {
     addressCache.set(normalizedCoord, fallback);
     return fallback;
   }
+}
+
+// Batch geocode with concurrency control
+async function batchGeocode(coords: string[], concurrency: number = 3): Promise<Map<string, string>> {
+  const results = new Map<string, string>();
+  const locationIQKey = import.meta.env.VITE_LOCATIONIQ_API_KEY;
+  
+  // Log once whether we're using LocationIQ or Nominatim
+  console.log(`Geocoding using: ${locationIQKey ? 'LocationIQ' : 'Nominatim (fallback)'}`);
+  
+  // Deduplicate coordinates
+  const uniqueCoords = [...new Set(coords.map(c => normalizeCoordString(c)))];
+  const uncachedCoords = uniqueCoords.filter(c => !addressCache.has(c));
+  
+  console.log(`Unique coordinates: ${uniqueCoords.length}, Uncached: ${uncachedCoords.length}`);
+  
+  // Process in batches
+  for (let i = 0; i < uncachedCoords.length; i += concurrency) {
+    const batch = uncachedCoords.slice(i, i + concurrency);
+    
+    // Add delay between batches (respect rate limits)
+    if (i > 0) {
+      const delay = locationIQKey ? 600 : 1100; // LocationIQ: 2/sec, Nominatim: 1/sec
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+    
+    // Process batch concurrently
+    await Promise.all(batch.map(async (coord) => {
+      // Find original coord string that normalizes to this
+      const originalCoord = coords.find(c => normalizeCoordString(c) === coord) || coord;
+      const address = await reverseGeocode(originalCoord);
+      results.set(coord, address);
+    }));
+  }
+  
+  // Add cached results
+  uniqueCoords.forEach(coord => {
+    if (addressCache.has(coord)) {
+      results.set(coord, addressCache.get(coord)!);
+    }
+  });
+  
+  return results;
 }
 
 // Format coordinate string in a more readable way
@@ -193,20 +233,48 @@ export async function parseGoogleTimeline(
   // Sort by date (newest first)
   trips.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   
-  // Second pass: geocode addresses (async)
-  console.log('Starting geocoding...');
-  const totalAddresses = trips.length * 2; // start + end for each trip
-  let processedAddresses = 0;
+  // Second pass: batch geocode addresses (much faster with parallel processing)
+  console.log('Starting batch geocoding...');
   
-  for (const trip of trips) {
-    trip.startAddress = await reverseGeocode(trip.startCoord);
-    processedAddresses++;
-    if (onProgress) onProgress(processedAddresses, totalAddresses);
+  // Collect all coordinates
+  const allCoords = trips.flatMap(trip => [trip.startCoord, trip.endCoord]);
+  const totalAddresses = allCoords.length;
+  
+  // Use batch geocoding with concurrency
+  let processedCount = 0;
+  const locationIQKey = import.meta.env.VITE_LOCATIONIQ_API_KEY;
+  const concurrency = locationIQKey ? 2 : 1; // LocationIQ can handle more concurrent requests
+  
+  // Deduplicate and get unique coords
+  const uniqueCoords = [...new Set(allCoords.map(c => normalizeCoordString(c)))];
+  const uncachedCoords = uniqueCoords.filter(c => !addressCache.has(c));
+  
+  // Process in batches with progress updates
+  for (let i = 0; i < uncachedCoords.length; i += concurrency) {
+    const batch = uncachedCoords.slice(i, i + concurrency);
     
-    trip.endAddress = await reverseGeocode(trip.endCoord);
-    processedAddresses++;
-    if (onProgress) onProgress(processedAddresses, totalAddresses);
+    // Add delay between batches
+    if (i > 0) {
+      const delay = locationIQKey ? 600 : 1100;
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+    
+    // Process batch concurrently
+    await Promise.all(batch.map(async (coord) => {
+      const originalCoord = allCoords.find(c => normalizeCoordString(c) === coord) || coord;
+      await reverseGeocode(originalCoord);
+      processedCount += 2; // Each unique coord typically appears twice (start/end)
+      if (onProgress) onProgress(Math.min(processedCount, totalAddresses), totalAddresses);
+    }));
   }
+  
+  // Apply cached addresses to trips
+  trips.forEach(trip => {
+    const startNorm = normalizeCoordString(trip.startCoord);
+    const endNorm = normalizeCoordString(trip.endCoord);
+    trip.startAddress = addressCache.get(startNorm) || formatCoordinate(trip.startCoord);
+    trip.endAddress = addressCache.get(endNorm) || formatCoordinate(trip.endCoord);
+  });
   
   console.log('Geocoding complete, returning trips');
   return trips;
