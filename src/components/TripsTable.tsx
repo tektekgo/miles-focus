@@ -6,13 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { CheckSquare } from "lucide-react";
+import { CheckSquare, ListFilter } from "lucide-react";
 
 interface TripsTableProps {
   trips: NormalizedTrip[];
   onTripUpdate: (tripId: string, updates: Partial<NormalizedTrip>) => void;
   selectedMonth: string;
   showUnassignedOnly?: boolean;
+  onToggleUnassignedOnly?: () => void;
 }
 
 const purposeOptions: TripPurpose[] = [
@@ -35,7 +36,7 @@ const getPurposeColor = (purpose: TripPurpose) => {
   }
 };
 
-export const TripsTable = ({ trips, onTripUpdate, selectedMonth, showUnassignedOnly = false }: TripsTableProps) => {
+export const TripsTable = ({ trips, onTripUpdate, selectedMonth, showUnassignedOnly = false, onToggleUnassignedOnly }: TripsTableProps) => {
   const [selectedTripIds, setSelectedTripIds] = useState<Set<string>>(new Set());
   const [bulkPurpose, setBulkPurpose] = useState<TripPurpose>("Business");
 
@@ -75,8 +76,38 @@ export const TripsTable = ({ trips, onTripUpdate, selectedMonth, showUnassignedO
     setSelectedTripIds(new Set());
   };
 
+  const unassignedCount = (selectedMonth === "all" ? trips : trips.filter(t => t.date.startsWith(selectedMonth)))
+    .filter(t => t.purpose === "Unassigned").length;
+
   return (
     <Card className="overflow-hidden">
+      {/* Inline filter bar */}
+      <div className="bg-muted/50 border-b px-4 py-3 flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">
+            {filteredTrips.length} trip{filteredTrips.length !== 1 ? 's' : ''}
+          </span>
+          {selectedMonth !== "all" && (
+            <span>in {selectedMonth}</span>
+          )}
+          {unassignedCount > 0 && (
+            <span className="text-yellow-600 dark:text-yellow-500">
+              ({unassignedCount} unassigned)
+            </span>
+          )}
+        </div>
+        {onToggleUnassignedOnly && (
+          <Button 
+            variant={showUnassignedOnly ? "default" : "outline"}
+            onClick={onToggleUnassignedOnly}
+            size="sm"
+          >
+            <ListFilter className="mr-2 h-4 w-4" />
+            {showUnassignedOnly ? "Show All" : "Unassigned Only"}
+          </Button>
+        )}
+      </div>
+      
       {selectedTripIds.size > 0 && (
         <div className="bg-primary/10 border-b px-4 py-3 flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-3">
