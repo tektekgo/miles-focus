@@ -1,4 +1,4 @@
-import { GoogleTimelineActivity, NormalizedTrip, MonthlySummary } from "@/types/trip";
+import { GoogleTimelineActivity, NormalizedTrip, MonthlySummary, TripPurpose } from "@/types/trip";
 
 const METERS_TO_MILES = 1609.34;
 
@@ -85,7 +85,8 @@ function calculateDuration(start: string, end: string): number {
 }
 
 export async function parseGoogleTimeline(
-  jsonData: GoogleTimelineActivity[], 
+  jsonData: GoogleTimelineActivity[],
+  defaultPurpose: TripPurpose = "Unassigned",
   onProgress?: (current: number, total: number) => void
 ): Promise<NormalizedTrip[]> {
   const trips: NormalizedTrip[] = [];
@@ -114,7 +115,7 @@ export async function parseGoogleTimeline(
         endCoord: item.activity.end,
         startAddress: "Loading...",
         endAddress: "Loading...",
-        purpose: "Unassigned",
+        purpose: defaultPurpose,
         notes: "",
       });
     }
