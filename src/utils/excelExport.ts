@@ -12,6 +12,8 @@ export function exportToExcel(trips: NormalizedTrip[], summaries: MonthlySummary
     "End Time": trip.endTimeLocal,
     "Duration (min)": trip.durationMinutes,
     "Distance (Miles)": trip.distanceMiles,
+    From: trip.startAddress,
+    To: trip.endAddress,
     Purpose: trip.purpose,
     Notes: trip.notes,
     "Start Coord": trip.startCoord,
@@ -27,6 +29,8 @@ export function exportToExcel(trips: NormalizedTrip[], summaries: MonthlySummary
     { wch: 12 }, // End Time
     { wch: 14 }, // Duration
     { wch: 16 }, // Distance
+    { wch: 40 }, // From
+    { wch: 40 }, // To
     { wch: 12 }, // Purpose
     { wch: 30 }, // Notes
     { wch: 20 }, // Start Coord
