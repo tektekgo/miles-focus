@@ -21,6 +21,7 @@ const Index = () => {
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
   const [selectedPurposes, setSelectedPurposes] = useState<TripPurpose[]>(["Business", "Personal", "Medical", "Charitable", "Other"]);
   const [showUnassignedOnly, setShowUnassignedOnly] = useState(false);
+  const [defaultPurpose, setDefaultPurpose] = useState<TripPurpose>("Unassigned");
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [geocodingProgress, setGeocodingProgress] = useState({ current: 0, total: 0 });
   const { toast } = useToast();
@@ -36,7 +37,7 @@ const Index = () => {
       description: "Extracting trips and geocoding addresses...",
     });
     
-    const parsedTrips = await parseGoogleTimeline(data, (current, total) => {
+    const parsedTrips = await parseGoogleTimeline(data, defaultPurpose, (current, total) => {
       setGeocodingProgress({ current, total });
     });
     
@@ -117,6 +118,28 @@ const Index = () => {
                 Extract and organize your driving mileage from Google Timeline
               </p>
             </div>
+            
+            <div className="mb-6 bg-card border rounded-lg p-4">
+              <label className="block text-sm font-medium text-foreground mb-2">
+                Default Purpose for New Trips
+              </label>
+              <Select value={defaultPurpose} onValueChange={(value) => setDefaultPurpose(value as TripPurpose)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {allPurposes.map(purpose => (
+                    <SelectItem key={purpose} value={purpose}>
+                      {purpose}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground mt-2">
+                Newly uploaded trips will start with this purpose instead of "Unassigned"
+              </p>
+            </div>
+            
             <FileUpload onDataLoaded={handleDataLoaded} />
             
             <div className="mt-12 space-y-4 text-sm text-muted-foreground">
