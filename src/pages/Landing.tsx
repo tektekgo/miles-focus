@@ -9,12 +9,12 @@ const Landing = () => {
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
       <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src={logoUrl} alt="AI-Focus Logo" className="h-10 w-10" />
+        <div className="container mx-auto px-4 py-6 flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <img src={logoUrl} alt="AI-Focus Logo" className="h-24 w-24" />
             <div>
-              <h1 className="text-xl font-bold text-primary">MilesFocus</h1>
-              <p className="text-xs text-muted-foreground">by AI-Focus Technologies</p>
+              <h1 className="text-4xl font-bold text-primary">MilesFocus</h1>
+              <p className="text-base text-muted-foreground">by AI-Focus Technologies</p>
             </div>
           </div>
           <Link to="/app">
