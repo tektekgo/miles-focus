@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { FileUpload } from "@/components/FileUpload";
 import { TripsTable } from "@/components/TripsTable";
@@ -147,6 +148,14 @@ const Index = () => {
             </div>
             
             <FileUpload onDataLoaded={handleDataLoaded} />
+            
+            <div className="text-center mt-4">
+              <Link to="/guide" target="_blank" rel="noopener noreferrer">
+                <Button variant="link" className="text-primary">
+                  How do I download my Timeline data?
+                </Button>
+              </Link>
+            </div>
             
             <div className="mt-12 space-y-4 text-sm text-muted-foreground">
               <h3 className="font-semibold text-foreground">How it works:</h3>
