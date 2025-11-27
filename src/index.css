@@ -112,8 +112,10 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground font-sans antialiased;
     background-image: 
+      radial-gradient(circle at 1px 1px, hsl(var(--primary) / 0.03) 1px, transparent 0),
       radial-gradient(ellipse at top, hsl(var(--primary-light)) 0%, transparent 50%),
       radial-gradient(ellipse at bottom right, hsl(var(--accent-light)) 0%, transparent 40%);
+    background-size: 24px 24px, 100% 100%, 100% 100%;
     background-attachment: fixed;
     min-height: 100vh;
   }
@@ -123,6 +125,15 @@ All colors MUST be HSL.
   body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
+}
+
+/* Dark mode pattern adjustment */
+.dark body {
+  background-image: 
+    radial-gradient(circle at 1px 1px, hsl(var(--primary-glow) / 0.05) 1px, transparent 0),
+    radial-gradient(ellipse at top, hsl(var(--primary-light)) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom right, hsl(var(--accent-light)) 0%, transparent 40%);
+  background-size: 24px 24px, 100% 100%, 100% 100%;
 }
 
 @layer utilities {
