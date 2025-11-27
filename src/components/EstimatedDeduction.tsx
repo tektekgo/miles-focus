@@ -1,13 +1,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CURRENT_IRS_RATES, calculateDeduction, formatRate } from "@/config/irsRates";
+import { CURRENT_IRS_RATES, calculateDeduction, formatRate, IRSRates } from "@/config/irsRates";
 import { DollarSign } from "lucide-react";
 
 interface EstimatedDeductionProps {
   businessMiles: number;
+  customRates: IRSRates | null;
 }
 
-export const EstimatedDeduction = ({ businessMiles }: EstimatedDeductionProps) => {
-  const deduction = calculateDeduction(businessMiles, CURRENT_IRS_RATES.business);
+export const EstimatedDeduction = ({ businessMiles, customRates }: EstimatedDeductionProps) => {
+  const activeRates = customRates || CURRENT_IRS_RATES;
+  const deduction = calculateDeduction(businessMiles, activeRates.business);
+  const isCustom = customRates !== null;
   
   return (
     <Card className="border-primary/20 bg-primary/5">
@@ -22,7 +25,7 @@ export const EstimatedDeduction = ({ businessMiles }: EstimatedDeductionProps) =
           ${deduction.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </div>
         <p className="text-sm text-muted-foreground">
-          Based on {CURRENT_IRS_RATES.year} IRS Standard Mileage Rate ({formatRate(CURRENT_IRS_RATES.business)}/mile)
+          Based on {isCustom ? "custom" : `${activeRates.year} IRS standard`} mileage rate ({formatRate(activeRates.business)}/mile)
         </p>
         <p className="text-xs text-muted-foreground mt-2 italic">
           This is an estimate only. Consult a tax professional for personalized guidance.

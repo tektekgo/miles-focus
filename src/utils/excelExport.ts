@@ -1,6 +1,6 @@
 import * as XLSX from "xlsx";
 import { NormalizedTrip, MonthlySummary, TripPurpose } from "@/types/trip";
-import { CURRENT_IRS_RATES, calculateDeduction } from "@/config/irsRates";
+import { CURRENT_IRS_RATES, calculateDeduction, IRSRates } from "@/config/irsRates";
 
 // AI-Focus brand colors
 const NAVY_BLUE = "15314D"; // RGB(21, 49, 77)
@@ -12,8 +12,11 @@ export function exportToExcel(
   trips: NormalizedTrip[], 
   summaries: MonthlySummary[], 
   month: string = "", 
-  purposes: TripPurpose[] = ["Business", "Personal", "Medical", "Charitable", "Other", "Unassigned"]
+  purposes: TripPurpose[] = ["Business", "Personal", "Medical", "Charitable", "Other", "Unassigned"],
+  customRates: IRSRates | null = null
 ) {
+  const activeRates = customRates || CURRENT_IRS_RATES;
+  const isCustom = customRates !== null;
   // Filter trips by month and purposes
   let filteredTrips = trips;
   
@@ -140,8 +143,8 @@ export function exportToExcel(
     "Charitable Miles": s.charitableMiles.toFixed(2),
     "Other Miles": s.otherMiles.toFixed(2),
     "Total Miles": s.totalMiles.toFixed(2),
-    "IRS Business Rate": `$${CURRENT_IRS_RATES.business.toFixed(2)}`,
-    "Estimated Deduction": `$${calculateDeduction(s.businessMiles, CURRENT_IRS_RATES.business).toFixed(2)}`,
+    [`${isCustom ? 'Custom' : 'IRS'} Business Rate`]: `$${activeRates.business.toFixed(2)}`,
+    "Estimated Deduction": `$${calculateDeduction(s.businessMiles, activeRates.business).toFixed(2)}`,
   }));
   
   // Combine branding and summary data
