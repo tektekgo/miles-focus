@@ -32,7 +32,7 @@ export function exportToPDF(
   doc.text("MilesFocus", 35, 18);
   
   doc.setFontSize(10);
-  doc.text("AI-Focus Technologies", 35, 25);
+  doc.text("Mileage Tracking Made Simple", 35, 25);
   
   // Title
   doc.setTextColor(navyBlue[0], navyBlue[1], navyBlue[2]);
