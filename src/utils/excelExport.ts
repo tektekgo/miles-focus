@@ -26,6 +26,42 @@ export function exportToExcel(
   
   filteredTrips = filteredTrips.filter(t => purposes.includes(t.purpose));
   
+  // Recalculate summaries from filtered trips by month
+  const monthMap = new Map<string, {
+    businessMiles: number;
+    personalMiles: number;
+    medicalMiles: number;
+    charitableMiles: number;
+    otherMiles: number;
+    totalMiles: number;
+  }>();
+  
+  filteredTrips.forEach(trip => {
+    const tripMonth = trip.date.substring(0, 7);
+    if (!monthMap.has(tripMonth)) {
+      monthMap.set(tripMonth, {
+        businessMiles: 0,
+        personalMiles: 0,
+        medicalMiles: 0,
+        charitableMiles: 0,
+        otherMiles: 0,
+        totalMiles: 0,
+      });
+    }
+    const monthData = monthMap.get(tripMonth)!;
+    monthData.totalMiles += trip.distanceMiles;
+    if (trip.purpose === "Business") monthData.businessMiles += trip.distanceMiles;
+    else if (trip.purpose === "Personal") monthData.personalMiles += trip.distanceMiles;
+    else if (trip.purpose === "Medical") monthData.medicalMiles += trip.distanceMiles;
+    else if (trip.purpose === "Charitable") monthData.charitableMiles += trip.distanceMiles;
+    else if (trip.purpose === "Other") monthData.otherMiles += trip.distanceMiles;
+  });
+  
+  const filteredSummaries = Array.from(monthMap.entries()).map(([month, data]) => ({
+    month,
+    ...data,
+  })).sort((a, b) => a.month.localeCompare(b.month));
+  
   // Create a new workbook
   const wb = XLSX.utils.book_new();
   
@@ -135,7 +171,7 @@ export function exportToExcel(
     ["", "", "", "", "", "", ""],
   ];
   
-  const summaryData = summaries.map(s => ({
+  const summaryData = filteredSummaries.map(s => ({
     Month: s.month,
     "Business Miles": s.businessMiles.toFixed(2),
     "Personal Miles": s.personalMiles.toFixed(2),

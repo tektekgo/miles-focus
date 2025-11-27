@@ -52,14 +52,14 @@ export function exportToPDF(
   
   filteredTrips = filteredTrips.filter(t => purposes.includes(t.purpose));
   
-  // Get summary for this month
-  const summary = summaries.find(s => s.month === month) || {
-    businessMiles: 0,
-    personalMiles: 0,
-    medicalMiles: 0,
-    charitableMiles: 0,
-    otherMiles: 0,
-    totalMiles: 0,
+  // Calculate summary from filtered trips
+  const summary = {
+    businessMiles: filteredTrips.filter(t => t.purpose === "Business").reduce((sum, t) => sum + t.distanceMiles, 0),
+    personalMiles: filteredTrips.filter(t => t.purpose === "Personal").reduce((sum, t) => sum + t.distanceMiles, 0),
+    medicalMiles: filteredTrips.filter(t => t.purpose === "Medical").reduce((sum, t) => sum + t.distanceMiles, 0),
+    charitableMiles: filteredTrips.filter(t => t.purpose === "Charitable").reduce((sum, t) => sum + t.distanceMiles, 0),
+    otherMiles: filteredTrips.filter(t => t.purpose === "Other").reduce((sum, t) => sum + t.distanceMiles, 0),
+    totalMiles: filteredTrips.reduce((sum, t) => sum + t.distanceMiles, 0),
   };
   
   // Monthly Summary Box
