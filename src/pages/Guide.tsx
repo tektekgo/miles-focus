@@ -13,6 +13,7 @@ import {
   FileJson
 } from "lucide-react";
 import logoUrl from "@/assets/ai-focus-logo.png";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Guide = () => {
   return (
@@ -27,9 +28,12 @@ const Guide = () => {
               <p className="text-sm text-white/80">by AI-Focus Technologies</p>
             </div>
           </Link>
-          <Link to="/app">
-            <Button size="lg" className="bg-white text-primary hover:bg-white/90">Get Started</Button>
-          </Link>
+          <div className="flex items-center gap-3">
+            <ThemeToggle variant="header" />
+            <Link to="/app">
+              <Button size="lg" className="bg-white text-primary hover:bg-white/90">Get Started</Button>
+            </Link>
+          </div>
         </div>
       </header>
 

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, AlertCircle, BookOpen, DollarSign, FileText, Users } from "lucide-react";
 import logoUrl from "@/assets/ai-focus-logo.png";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const HowItWorks = () => {
   return (
@@ -17,9 +18,12 @@ const HowItWorks = () => {
               <p className="text-sm text-white/80">by AI-Focus Technologies</p>
             </div>
           </Link>
-          <Link to="/app">
-            <Button size="lg" className="bg-white text-primary hover:bg-white/90">Get Started</Button>
-          </Link>
+          <div className="flex items-center gap-3">
+            <ThemeToggle variant="header" />
+            <Link to="/app">
+              <Button size="lg" className="bg-white text-primary hover:bg-white/90">Get Started</Button>
+            </Link>
+          </div>
         </div>
       </header>
 

@@ -27,6 +27,7 @@ import { Link } from "react-router-dom";
 import logoUrl from "@/assets/ai-focus-logo.png";
 import logoNoText from "@/assets/ai-focus-logo-notext.png";
 import { DemoViewer } from "@/components/DemoViewer";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Landing = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -44,7 +45,8 @@ const Landing = () => {
             </div>
           </Link>
           
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-4">
+            <ThemeToggle variant="header" />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="gap-1 text-white hover:bg-white/10 hover:text-white">
@@ -83,7 +85,8 @@ const Landing = () => {
           </nav>
           
           {/* Mobile menu */}
-          <div className="md:hidden">
+          <div className="md:hidden flex items-center gap-2">
+            <ThemeToggle variant="header" />
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
