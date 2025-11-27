@@ -2,6 +2,15 @@ import { GoogleTimelineActivity, NormalizedTrip, MonthlySummary, TripPurpose } f
 
 const METERS_TO_MILES = 1609.34;
 
+export interface GeocodingStats {
+  totalAddresses: number;
+  uniqueAddresses: number;
+  freshApiCalls: number;
+  memoryCacheHits: number;
+  browserCacheHits: number;
+  errors: number;
+}
+
 // Keywords that indicate vehicle/driving activity
 const VEHICLE_KEYWORDS = [
   "vehicle",
@@ -14,6 +23,31 @@ const VEHICLE_KEYWORDS = [
 // Cache for geocoded addresses to avoid duplicate API calls
 const addressCache = new Map<string, string>();
 
+// Track geocoding statistics
+let geocodingStats: GeocodingStats = {
+  totalAddresses: 0,
+  uniqueAddresses: 0,
+  freshApiCalls: 0,
+  memoryCacheHits: 0,
+  browserCacheHits: 0,
+  errors: 0,
+};
+
+export function getGeocodingStats(): GeocodingStats {
+  return { ...geocodingStats };
+}
+
+export function resetGeocodingStats(): void {
+  geocodingStats = {
+    totalAddresses: 0,
+    uniqueAddresses: 0,
+    freshApiCalls: 0,
+    memoryCacheHits: 0,
+    browserCacheHits: 0,
+    errors: 0,
+  };
+}
+
 // Round coordinates to 3 decimal places for better cache hits (~100m precision)
 function normalizeCoordString(coordString: string): string {
   const latLngMatch = coordString.match(/geo:(-?\d+\.?\d*),(-?\d+\.?\d*)/);
@@ -23,13 +57,14 @@ function normalizeCoordString(coordString: string): string {
   return `geo:${lat},${lon}`;
 }
 
-async function reverseGeocode(coordString: string): Promise<string> {
+async function reverseGeocode(coordString: string, trackStats: boolean = true): Promise<{ address: string; source: 'memory' | 'browser' | 'api' | 'fallback' }> {
   // Normalize coordinate for better cache hits
   const normalizedCoord = normalizeCoordString(coordString);
   
-  // Check cache first (using normalized coordinates)
+  // Check memory cache first (using normalized coordinates)
   if (addressCache.has(normalizedCoord)) {
-    return addressCache.get(normalizedCoord)!;
+    if (trackStats) geocodingStats.memoryCacheHits++;
+    return { address: addressCache.get(normalizedCoord)!, source: 'memory' };
   }
   
   try {
@@ -37,7 +72,8 @@ async function reverseGeocode(coordString: string): Promise<string> {
     const latLngMatch = coordString.match(/geo:(-?\d+\.?\d*),(-?\d+\.?\d*)/);
     if (!latLngMatch) {
       console.warn('Could not parse coordinate:', coordString);
-      return formatCoordinate(coordString);
+      if (trackStats) geocodingStats.errors++;
+      return { address: formatCoordinate(coordString), source: 'fallback' };
     }
 
     const [, lat, lon] = latLngMatch;
@@ -48,11 +84,14 @@ async function reverseGeocode(coordString: string): Promise<string> {
       console.warn('LocationIQ API key not configured, using coordinate fallback');
       const fallback = formatCoordinate(coordString);
       addressCache.set(normalizedCoord, fallback);
-      return fallback;
+      if (trackStats) geocodingStats.errors++;
+      return { address: fallback, source: 'fallback' };
     }
     
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    
+    const startTime = performance.now();
     
     // Use LocationIQ API (supports CORS, 2 req/sec on free tier)
     const response = await fetch(
@@ -66,12 +105,17 @@ async function reverseGeocode(coordString: string): Promise<string> {
     );
     
     clearTimeout(timeoutId);
+    
+    const elapsed = performance.now() - startTime;
+    // If response is very fast (<50ms), it's likely from browser cache
+    const isBrowserCache = elapsed < 50;
 
     if (!response.ok) {
       console.warn('LocationIQ API error:', response.status);
       const fallback = formatCoordinate(coordString);
       addressCache.set(normalizedCoord, fallback);
-      return fallback;
+      if (trackStats) geocodingStats.errors++;
+      return { address: fallback, source: 'fallback' };
     }
 
     const data = await response.json();
@@ -105,7 +149,15 @@ async function reverseGeocode(coordString: string): Promise<string> {
     // Cache the result using normalized coordinates
     addressCache.set(normalizedCoord, address);
     
-    return address;
+    if (trackStats) {
+      if (isBrowserCache) {
+        geocodingStats.browserCacheHits++;
+      } else {
+        geocodingStats.freshApiCalls++;
+      }
+    }
+    
+    return { address, source: isBrowserCache ? 'browser' : 'api' };
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
       console.warn('Geocoding timeout for:', coordString);
@@ -114,7 +166,8 @@ async function reverseGeocode(coordString: string): Promise<string> {
     }
     const fallback = formatCoordinate(coordString);
     addressCache.set(normalizedCoord, fallback);
-    return fallback;
+    if (trackStats) geocodingStats.errors++;
+    return { address: fallback, source: 'fallback' };
   }
 }
 
@@ -160,6 +213,9 @@ export async function parseGoogleTimeline(
 ): Promise<NormalizedTrip[]> {
   const trips: NormalizedTrip[] = [];
   
+  // Reset stats for this parsing session
+  resetGeocodingStats();
+  
   console.log('Parsing timeline data, total items:', jsonData.length);
   
   // First pass: create trips with coordinates
@@ -195,18 +251,23 @@ export async function parseGoogleTimeline(
   // Sort by date (newest first)
   trips.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   
-  // Second pass: geocode addresses sequentially (respects Nominatim rate limit)
+  // Second pass: geocode addresses sequentially
   console.log('Starting geocoding...');
   
   // Collect all coordinates
   const allCoords = trips.flatMap(trip => [trip.startCoord, trip.endCoord]);
-  const totalAddresses = allCoords.length;
+  geocodingStats.totalAddresses = allCoords.length;
   
   // Deduplicate and get unique coords
   const uniqueCoords = [...new Set(allCoords.map(c => normalizeCoordString(c)))];
-  const uncachedCoords = uniqueCoords.filter(c => !addressCache.has(c));
+  geocodingStats.uniqueAddresses = uniqueCoords.length;
   
-  console.log(`Unique: ${uniqueCoords.length}, Need to fetch: ${uncachedCoords.length}`);
+  // Check which coords are already in memory cache
+  const uncachedCoords = uniqueCoords.filter(c => !addressCache.has(c));
+  const memoryCacheCount = uniqueCoords.length - uncachedCoords.length;
+  geocodingStats.memoryCacheHits = memoryCacheCount;
+  
+  console.log(`Unique: ${uniqueCoords.length}, Memory cached: ${memoryCacheCount}, Need to fetch: ${uncachedCoords.length}`);
   
   // Process sequentially with progress updates
   for (let i = 0; i < uncachedCoords.length; i++) {
@@ -218,11 +279,11 @@ export async function parseGoogleTimeline(
     }
     
     const originalCoord = allCoords.find(c => normalizeCoordString(c) === coord) || coord;
-    await reverseGeocode(originalCoord);
+    await reverseGeocode(originalCoord, true);
     
     // Update progress
-    const processedCount = Math.min((i + 1) * 2, totalAddresses);
-    if (onProgress) onProgress(processedCount, totalAddresses);
+    const processedCount = memoryCacheCount + i + 1;
+    if (onProgress) onProgress(processedCount, uniqueCoords.length);
   }
   
   // Apply cached addresses to trips
@@ -233,7 +294,7 @@ export async function parseGoogleTimeline(
     trip.endAddress = addressCache.get(endNorm) || formatCoordinate(trip.endCoord);
   });
   
-  console.log('Geocoding complete, returning trips');
+  console.log('Geocoding complete, stats:', geocodingStats);
   return trips;
 }
 

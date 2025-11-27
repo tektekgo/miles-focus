@@ -8,6 +8,7 @@ import { IRSRatesPanel } from "@/components/IRSRatesPanel";
 import { EstimatedDeduction } from "@/components/EstimatedDeduction";
 import { DeductionComparison } from "@/components/DeductionComparison";
 import { DateRangeSelector, DateRange } from "@/components/DateRangeSelector";
+import { GeocodingStats } from "@/components/GeocodingStats";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -16,7 +17,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FileSpreadsheet, FileText, Filter, AlertCircle, ListFilter } from "lucide-react";
 import { GoogleTimelineActivity, NormalizedTrip, TripPurpose } from "@/types/trip";
-import { parseGoogleTimeline, calculateMonthlySummaries } from "@/utils/timelineParser";
+import { parseGoogleTimeline, calculateMonthlySummaries, getGeocodingStats, GeocodingStats as GeocodingStatsType } from "@/utils/timelineParser";
 import { exportToExcel } from "@/utils/excelExport";
 import { exportToPDF } from "@/utils/pdfExport";
 import { useToast } from "@/hooks/use-toast";
@@ -32,6 +33,7 @@ const Index = () => {
   const [customRates, setCustomRates] = useState<IRSRates | null>(null);
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [geocodingProgress, setGeocodingProgress] = useState({ current: 0, total: 0 });
+  const [geocodingStats, setGeocodingStats] = useState<GeocodingStatsType | null>(null);
   const { toast } = useToast();
   
   const allPurposes: TripPurpose[] = ["Business", "Personal", "Medical", "Charitable", "Other", "Unassigned"];
@@ -39,6 +41,7 @@ const Index = () => {
   const handleDataLoaded = async (data: GoogleTimelineActivity[]) => {
     setRawData(data);
     setIsGeocoding(true);
+    setGeocodingStats(null);
     
     toast({
       title: "Processing...",
@@ -52,6 +55,7 @@ const Index = () => {
     setTrips(parsedTrips);
     setIsGeocoding(false);
     setGeocodingProgress({ current: 0, total: 0 });
+    setGeocodingStats(getGeocodingStats());
     
     toast({
       title: "Trips Extracted!",
@@ -227,6 +231,10 @@ const Index = () => {
               </div>
             )}
             
+            {!isGeocoding && geocodingStats && (
+              <GeocodingStats stats={geocodingStats} />
+            )}
+            
             {!isGeocoding && (
               <Alert className="bg-primary/10 border-primary">
                 <AlertCircle className="h-5 w-5 text-primary" />
@@ -343,6 +351,7 @@ const Index = () => {
                   setRawData(null);
                   setTrips([]);
                   setSelectedRange({ type: "all", value: "all", label: "All Months" });
+                  setGeocodingStats(null);
                 }}
               >
                 Upload Different File
