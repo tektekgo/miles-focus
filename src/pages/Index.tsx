@@ -5,8 +5,10 @@ import { TripsTable } from "@/components/TripsTable";
 import { MonthlySummary } from "@/components/MonthlySummary";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, FileSpreadsheet, FileText } from "lucide-react";
-import { GoogleTimelineActivity, NormalizedTrip } from "@/types/trip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Download, FileSpreadsheet, FileText, Filter } from "lucide-react";
+import { GoogleTimelineActivity, NormalizedTrip, TripPurpose } from "@/types/trip";
 import { parseGoogleTimeline, calculateMonthlySummaries } from "@/utils/timelineParser";
 import { exportToExcel } from "@/utils/excelExport";
 import { exportToPDF } from "@/utils/pdfExport";
@@ -16,9 +18,12 @@ const Index = () => {
   const [rawData, setRawData] = useState<GoogleTimelineActivity[] | null>(null);
   const [trips, setTrips] = useState<NormalizedTrip[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
+  const [selectedPurposes, setSelectedPurposes] = useState<TripPurpose[]>(["Business", "Personal", "Medical", "Charitable", "Other"]);
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [geocodingProgress, setGeocodingProgress] = useState({ current: 0, total: 0 });
   const { toast } = useToast();
+  
+  const allPurposes: TripPurpose[] = ["Business", "Personal", "Medical", "Charitable", "Other", "Unassigned"];
 
   const handleDataLoaded = async (data: GoogleTimelineActivity[]) => {
     setRawData(data);
@@ -63,7 +68,7 @@ const Index = () => {
       return;
     }
     
-    exportToExcel(trips, summaries);
+    exportToExcel(trips, summaries, selectedMonth === "all" ? "" : selectedMonth, selectedPurposes);
     toast({
       title: "Excel Exported!",
       description: "Your mileage report has been downloaded.",
@@ -80,11 +85,19 @@ const Index = () => {
       return;
     }
     
-    exportToPDF(trips, summaries, selectedMonth === "all" ? "" : selectedMonth);
+    exportToPDF(trips, summaries, selectedMonth === "all" ? "" : selectedMonth, selectedPurposes);
     toast({
       title: "PDF Exported!",
       description: "Your IRS-ready report has been downloaded.",
     });
+  };
+  
+  const togglePurpose = (purpose: TripPurpose) => {
+    setSelectedPurposes(prev => 
+      prev.includes(purpose)
+        ? prev.filter(p => p !== purpose)
+        : [...prev, purpose]
+    );
   };
 
   return (
@@ -161,6 +174,35 @@ const Index = () => {
                     ))}
                   </SelectContent>
                 </Select>
+                
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="default">
+                      <Filter className="mr-2 h-4 w-4" />
+                      Purposes ({selectedPurposes.length})
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-56" align="start">
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-sm">Export Purposes</h4>
+                      {allPurposes.map(purpose => (
+                        <div key={purpose} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={purpose}
+                            checked={selectedPurposes.includes(purpose)}
+                            onCheckedChange={() => togglePurpose(purpose)}
+                          />
+                          <label
+                            htmlFor={purpose}
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                          >
+                            {purpose}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
                 
                 <Button onClick={handleExportExcel} variant="outline">
                   <FileSpreadsheet className="mr-2 h-4 w-4" />
