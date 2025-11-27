@@ -116,6 +116,25 @@ export function exportToPDF(
   
   const businessTrips = filteredTrips.filter(t => t.purpose === "Business");
   
+  // Color mapping for purposes (matching app colors)
+  const purposeColors: Record<string, [number, number, number]> = {
+    Business: [219, 234, 254], // blue-50
+    Medical: [240, 253, 244], // green-50
+    Charitable: [250, 245, 255], // purple-50
+    Personal: [249, 250, 251], // gray-50
+    Other: [255, 247, 237], // orange-50
+    Unassigned: [254, 252, 232], // yellow-50
+  };
+  
+  const purposeTextColors: Record<string, [number, number, number]> = {
+    Business: [29, 78, 216], // blue-700
+    Medical: [21, 128, 61], // green-700
+    Charitable: [126, 34, 206], // purple-700
+    Personal: [55, 65, 81], // gray-700
+    Other: [194, 65, 12], // orange-700
+    Unassigned: [161, 98, 7], // yellow-700
+  };
+  
   const tableData = businessTrips.map(trip => [
     trip.date,
     trip.startTimeLocal,
@@ -123,12 +142,13 @@ export function exportToPDF(
     trip.startAddress,
     trip.endAddress,
     trip.distanceMiles.toFixed(2),
+    trip.purpose, // Add purpose column
     trip.notes || "-",
   ]);
   
   autoTable(doc, {
     startY: yPos + 5,
-    head: [["Date", "Start Time", "End Time", "From", "To", "Miles", "Notes"]],
+    head: [["Date", "Start Time", "End Time", "From", "To", "Miles", "Purpose", "Notes"]],
     body: tableData,
     theme: "striped",
     headStyles: {
@@ -145,15 +165,29 @@ export function exportToPDF(
       textColor: darkGrey,
     },
     columnStyles: {
-      0: { cellWidth: 22 },
-      1: { cellWidth: 20 },
-      2: { cellWidth: 20 },
-      3: { cellWidth: 35 },
-      4: { cellWidth: 35 },
-      5: { cellWidth: 18 },
-      6: { cellWidth: 'auto' },
+      0: { cellWidth: 20 },
+      1: { cellWidth: 18 },
+      2: { cellWidth: 18 },
+      3: { cellWidth: 32 },
+      4: { cellWidth: 32 },
+      5: { cellWidth: 16 },
+      6: { cellWidth: 22 }, // Purpose column
+      7: { cellWidth: 'auto' },
     },
-    margin: { bottom: 50 }, // Add extra bottom margin to prevent overlap
+    margin: { bottom: 50 },
+    didParseCell: function(data) {
+      // Color the Purpose column cells
+      if (data.section === 'body' && data.column.index === 6) {
+        const purpose = data.cell.text[0];
+        const bgColor = purposeColors[purpose] || [255, 255, 255];
+        const textColor = purposeTextColors[purpose] || darkGrey;
+        
+        data.cell.styles.fillColor = bgColor;
+        data.cell.styles.textColor = textColor;
+        data.cell.styles.fontStyle = 'bold';
+        data.cell.styles.fontSize = 8;
+      }
+    },
   });
   
   // Footer with Disclaimer
