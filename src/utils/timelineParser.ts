@@ -48,6 +48,24 @@ export function resetGeocodingStats(): void {
   };
 }
 
+// Clear memory cache to force fresh geocoding
+export function clearGeocodingCache(): void {
+  addressCache.clear();
+  console.log('Geocoding memory cache cleared');
+}
+
+// Get cache size for UI display
+export function getGeocodingCacheSize(): number {
+  return addressCache.size;
+}
+
+// Flag to bypass browser cache (adds cache-busting query param)
+let bypassBrowserCache = false;
+
+export function setBypassBrowserCache(bypass: boolean): void {
+  bypassBrowserCache = bypass;
+}
+
 // Round coordinates to 3 decimal places for better cache hits (~100m precision)
 function normalizeCoordString(coordString: string): string {
   const latLngMatch = coordString.match(/geo:(-?\d+\.?\d*),(-?\d+\.?\d*)/);
@@ -93,16 +111,21 @@ async function reverseGeocode(coordString: string, trackStats: boolean = true): 
     
     const startTime = performance.now();
     
+    // Build URL with optional cache-busting
+    let url = `https://us1.locationiq.com/v1/reverse?key=${apiKey}&lat=${lat}&lon=${lon}&format=json`;
+    if (bypassBrowserCache) {
+      url += `&_cb=${Date.now()}`;
+    }
+    
     // Use LocationIQ API (supports CORS, 2 req/sec on free tier)
-    const response = await fetch(
-      `https://us1.locationiq.com/v1/reverse?key=${apiKey}&lat=${lat}&lon=${lon}&format=json`,
-      {
-        headers: {
-          'Accept': 'application/json',
-        },
-        signal: controller.signal,
-      }
-    );
+    const response = await fetch(url, {
+      headers: {
+        'Accept': 'application/json',
+        ...(bypassBrowserCache ? { 'Cache-Control': 'no-cache' } : {}),
+      },
+      signal: controller.signal,
+      ...(bypassBrowserCache ? { cache: 'no-store' as RequestCache } : {}),
+    });
     
     clearTimeout(timeoutId);
     
@@ -206,10 +229,17 @@ function calculateDuration(start: string, end: string): number {
   return Math.round((endTime - startTime) / (1000 * 60)); // minutes
 }
 
+export interface GeocodingProgress {
+  current: number;
+  total: number;
+  remaining: number;
+  estimatedSecondsRemaining: number;
+}
+
 export async function parseGoogleTimeline(
   jsonData: GoogleTimelineActivity[],
   defaultPurpose: TripPurpose = "Unassigned",
-  onProgress?: (current: number, total: number) => void
+  onProgress?: (progress: GeocodingProgress) => void
 ): Promise<NormalizedTrip[]> {
   const trips: NormalizedTrip[] = [];
   
@@ -269,21 +299,34 @@ export async function parseGoogleTimeline(
   
   console.log(`Unique: ${uniqueCoords.length}, Memory cached: ${memoryCacheCount}, Need to fetch: ${uncachedCoords.length}`);
   
+  // Rate limit: 550ms between requests
+  const MS_PER_REQUEST = 550;
+  
   // Process sequentially with progress updates
   for (let i = 0; i < uncachedCoords.length; i++) {
     const coord = uncachedCoords[i];
     
     // Add delay between requests (respect LocationIQ rate limit: 2 req/sec)
     if (i > 0) {
-      await new Promise(resolve => setTimeout(resolve, 550));
+      await new Promise(resolve => setTimeout(resolve, MS_PER_REQUEST));
     }
     
     const originalCoord = allCoords.find(c => normalizeCoordString(c) === coord) || coord;
     await reverseGeocode(originalCoord, true);
     
-    // Update progress
+    // Update progress with ETA
     const processedCount = memoryCacheCount + i + 1;
-    if (onProgress) onProgress(processedCount, uniqueCoords.length);
+    const remaining = uncachedCoords.length - (i + 1);
+    const estimatedSecondsRemaining = Math.ceil((remaining * MS_PER_REQUEST) / 1000);
+    
+    if (onProgress) {
+      onProgress({
+        current: processedCount,
+        total: uniqueCoords.length,
+        remaining,
+        estimatedSecondsRemaining,
+      });
+    }
   }
   
   // Apply cached addresses to trips
