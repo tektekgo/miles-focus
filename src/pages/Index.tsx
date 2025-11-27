@@ -31,6 +31,7 @@ import { exportToExcel } from "@/utils/excelExport";
 import { exportToPDF } from "@/utils/pdfExport";
 import { useToast } from "@/hooks/use-toast";
 import { IRSRates } from "@/config/irsRates";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const Index = () => {
   const [rawData, setRawData] = useState<GoogleTimelineActivity[] | null>(null);
@@ -303,16 +304,28 @@ const Index = () => {
               <div className="space-y-3">
                 <GeocodingStats stats={geocodingStats} />
                 <div className="flex justify-end">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={handleClearCacheAndReload}
-                    disabled={isGeocoding}
-                    className="gap-2"
-                  >
-                    <RefreshCw className="h-4 w-4" />
-                    Force Fresh Geocoding
-                  </Button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={handleClearCacheAndReload}
+                          disabled={isGeocoding}
+                          className="gap-2"
+                        >
+                          <RefreshCw className="h-4 w-4" />
+                          Force Fresh Geocoding
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="left" className="max-w-[280px]">
+                        <p className="text-sm">
+                          Use this if addresses appear outdated or incorrect. 
+                          Clears all cached data and fetches fresh addresses from the geocoding service.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </div>
             )}
