@@ -14,10 +14,22 @@ const VEHICLE_KEYWORDS = [
 // Cache for geocoded addresses to avoid duplicate API calls
 const addressCache = new Map<string, string>();
 
+// Round coordinates to 3 decimal places for better cache hits (~100m precision)
+function normalizeCoordString(coordString: string): string {
+  const latLngMatch = coordString.match(/geo:(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+  if (!latLngMatch) return coordString;
+  const lat = parseFloat(latLngMatch[1]).toFixed(3);
+  const lon = parseFloat(latLngMatch[2]).toFixed(3);
+  return `geo:${lat},${lon}`;
+}
+
 async function reverseGeocode(coordString: string): Promise<string> {
-  // Check cache first
-  if (addressCache.has(coordString)) {
-    return addressCache.get(coordString)!;
+  // Normalize coordinate for better cache hits
+  const normalizedCoord = normalizeCoordString(coordString);
+  
+  // Check cache first (using normalized coordinates)
+  if (addressCache.has(normalizedCoord)) {
+    return addressCache.get(normalizedCoord)!;
   }
 
   try {
@@ -31,11 +43,11 @@ async function reverseGeocode(coordString: string): Promise<string> {
     const [, lat, lon] = latLngMatch;
     
     // Add delay to respect rate limits (1 req/sec)
-    await new Promise(resolve => setTimeout(resolve, 1100));
+    await new Promise(resolve => setTimeout(resolve, 1050));
     
-    // Use a CORS proxy to access Nominatim
+    // Use Nominatim with shorter timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
     
     const response = await fetch(
       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`,
@@ -52,7 +64,7 @@ async function reverseGeocode(coordString: string): Promise<string> {
     if (!response.ok) {
       console.warn('Geocoding API error:', response.status);
       const fallback = formatCoordinate(coordString);
-      addressCache.set(coordString, fallback);
+      addressCache.set(normalizedCoord, fallback);
       return fallback;
     }
 
@@ -85,8 +97,8 @@ async function reverseGeocode(coordString: string): Promise<string> {
       address = formatCoordinate(coordString);
     }
     
-    // Cache the result
-    addressCache.set(coordString, address);
+    // Cache the result using normalized coordinates
+    addressCache.set(normalizedCoord, address);
     
     return address;
   } catch (error) {
@@ -96,7 +108,7 @@ async function reverseGeocode(coordString: string): Promise<string> {
       console.error('Geocoding error:', error);
     }
     const fallback = formatCoordinate(coordString);
-    addressCache.set(coordString, fallback);
+    addressCache.set(normalizedCoord, fallback);
     return fallback;
   }
 }
