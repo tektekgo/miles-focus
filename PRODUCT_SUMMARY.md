@@ -2,7 +2,7 @@
 
 **Prepared for:** Product Management Review  
 **Date:** November 2024  
-**Version:** 1.0
+**Version:** 1.1
 
 ---
 
@@ -24,8 +24,11 @@ MilesFocus is a privacy-first web application that converts Google Timeline loca
 |---------|-------------|
 | **File Upload** | Drag-and-drop Google Timeline JSON file upload |
 | **Smart Extraction** | Automatically identifies driving trips (filters for vehicle/car/passenger activities) |
-| **Reverse Geocoding** | Converts GPS coordinates to human-readable addresses using Nominatim API |
-| **Progress Tracking** | Visual progress indicator during geocoding process |
+| **Reverse Geocoding** | Converts GPS coordinates to human-readable addresses using LocationIQ API |
+| **Progress Tracking** | Visual progress bar with estimated time remaining during geocoding |
+| **Geocoding Statistics** | Transparency panel showing API calls, cache hits (browser/memory), and fallbacks |
+| **Smart Caching** | Multi-layer caching (memory + browser localStorage) to minimize API calls |
+| **Force Fresh Geocoding** | Button with tooltip to clear cache and fetch fresh addresses when needed |
 | **Local Processing** | All data processed client-side—no server uploads |
 
 ### 2. Trip Management
@@ -40,10 +43,16 @@ MilesFocus is a privacy-first web application that converts Google Timeline loca
 
 ### 3. Filtering & Views
 
-- Filter by specific month or view all months
-- Filter to show only unassigned trips (for easy categorization)
-- Filter by trip purpose categories
-- Toggle purposes on/off for export selection
+| Feature | Description |
+|---------|-------------|
+| **Date Range Selector** | Flexible date filtering with multiple selection modes |
+| **Quick Select Options** | All Months, Last 30/60/90 Days, Year-to-Date, Tax Year |
+| **Monthly Selection** | Pick individual months from available data |
+| **Quarterly Selection** | Select Q1, Q2, Q3, or Q4 with one click |
+| **Custom Multi-Month** | Checkbox selection for any combination of months |
+| **Unassigned Filter** | Show only trips needing categorization (dual placement: top + inline) |
+| **Purpose Filter** | Filter by trip purpose categories |
+| **Purpose Toggle** | Enable/disable purposes for export selection |
 
 ### 4. IRS Rate Integration
 
@@ -61,22 +70,35 @@ MilesFocus is a privacy-first web application that converts Google Timeline loca
 ### 5. Export Capabilities
 
 #### PDF Export
-- AI-Focus branded header with logo
+- AI-Focus branded header with MilesFocus logo
 - Monthly mileage summary by category
 - Detailed business trips table (Date, Times, Distance, From/To addresses, Notes)
 - IRS rate reference panel
 - Estimated business deduction calculation
 - Legal disclaimer footer
-- Respects month and purpose filters
+- Respects date range and purpose filters
 
 #### Excel Export (XLSX)
 - **Sheet 1 - Trips:** All trip data with addresses, color-coded purpose cells
 - **Sheet 2 - Monthly Summary:** Aggregated totals, IRS rates, estimated deductions
 - AI-Focus branding (navy headers, logo)
 - Legal disclaimer on both sheets
-- Respects month and purpose filters
+- Respects date range and purpose filters
 
-### 6. Supporting Pages & Content
+### 6. Geocoding System
+
+| Feature | Description |
+|---------|-------------|
+| **LocationIQ API** | Production geocoding service with higher rate limits |
+| **Memory Cache** | In-session coordinate-to-address cache |
+| **Browser Cache** | Persistent localStorage cache across sessions |
+| **Cache Statistics** | Visual display of API calls vs. cache hits |
+| **Rate Limiting** | 550ms delay between API calls (LocationIQ free tier compliance) |
+| **Estimated Time** | Progress indicator shows remaining geocoding time |
+| **Fallback Handling** | Graceful degradation to coordinates if geocoding fails |
+| **Force Refresh** | Clear all caches and re-fetch addresses on demand |
+
+### 7. Supporting Pages & Content
 
 | Page | Purpose |
 |------|---------|
@@ -86,12 +108,15 @@ MilesFocus is a privacy-first web application that converts Google Timeline loca
 | **About MilesFocus** | Company background and privacy philosophy |
 | **Timeline Download Guide** | Step-by-step instructions for exporting Google data |
 
-### 7. User Experience Features
+### 8. User Experience Features
 
-- Dark/Light mode toggle
-- Responsive design (mobile-optimized)
+- Dark/Light mode toggle with system preference detection
+- Responsive design (mobile-optimized with hamburger menu)
 - Interactive sample data demo on landing page
 - Prominent legal disclaimers throughout
+- Hover animations and micro-interactions
+- Consistent design language across all pages
+- Navy blue (#15314D) header branding
 
 ---
 
@@ -244,6 +269,7 @@ Week 7-8: Polish & Launch
 4. **IRS-Ready Exports** - Purpose-built for tax compliance
 5. **Transparent Pricing** - No hidden upsells or feature gates
 6. **Educational Content** - Guides users on IRS requirements
+7. **Smart Caching** - Minimizes API costs with multi-layer caching
 
 ### Target Market Segments
 
@@ -289,6 +315,7 @@ Week 7-8: Polish & Launch
 | IRS changes record-keeping requirements | Low | Medium | Stay updated on IRS publications |
 | Competitor copies approach | Medium | Medium | Build brand loyalty, add unique features |
 | Low conversion to paid | Medium | High | A/B test pricing, add value to paid tiers |
+| Geocoding API rate limits | Medium | Medium | Multi-layer caching, fallback to coordinates |
 
 ---
 
@@ -350,13 +377,34 @@ vehicles (
 ```
 Discovery → Landing Page → Interactive Demo → Sign Up
     ↓
-First Upload → Processing → Trip Review → Categorization
+First Upload → Processing → Geocoding (with progress) → Trip Review → Categorization
     ↓
 Export (Free: Watermarked) → Upgrade Prompt
     ↓
 Upgrade to Pro → Cloud Storage → Historical Access
     ↓
 Regular Usage → Monthly Reminders → Annual Reports → Renewal
+```
+
+---
+
+## Appendix C: Deployment Architecture
+
+```
+Frontend (Vercel)
+├── React 18 + TypeScript
+├── Vite build system
+├── Tailwind CSS + shadcn/ui
+└── Client-side processing
+
+External Services
+├── LocationIQ API (geocoding, HTTP referrer restricted)
+├── Vercel hosting (free tier, auto-deploy from GitHub)
+└── GitHub repository (tektekgo/milesfocus)
+
+Environment Configuration
+├── VITE_LOCATIONIQ_API_KEY (Vercel env vars)
+└── vercel.json (SPA routing rewrites)
 ```
 
 ---

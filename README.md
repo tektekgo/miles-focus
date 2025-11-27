@@ -2,22 +2,49 @@
 
 **AI-Focus Technologies Branded Mileage Extractor**
 
-MilesFocus is a professional web application that extracts driving mileage from Google Timeline JSON exports and generates IRS-ready reports in both PDF and Excel formats.
+MilesFocus is a privacy-first web application that extracts driving mileage from Google Timeline JSON exports and generates IRS-ready reports in both PDF and Excel formats.
 
 ![AI-Focus Technologies](src/assets/ai-focus-logo.png)
 
 ## Features
 
+### Core Functionality
 - 📤 **Simple Upload**: Drag & drop or select your Google Timeline JSON file
 - 🚗 **Smart Extraction**: Automatically identifies and extracts only driving segments
+- 🗺️ **Reverse Geocoding**: Converts coordinates to human-readable addresses via LocationIQ API
 - ✏️ **Interactive Review**: Edit trip purposes and add notes directly in the table
 - 📊 **Monthly Summaries**: View mileage breakdowns by category (Business, Personal, Medical, Charitable, Other)
+- 🔒 **Privacy First**: All processing happens locally in your browser - no data uploads
+
+### IRS Integration
 - 💰 **IRS Rate Information**: Display current IRS standard mileage rates with automatic yearly updates
 - 🧮 **Deduction Estimates**: Calculate estimated business mileage deductions based on official IRS rates
-- 📑 **Excel Export**: Generate comprehensive reports with trip details, monthly summaries, IRS rates, and estimated deductions
-- 📄 **IRS-Ready PDFs**: Professional PDF reports formatted for tax documentation with rate information and disclaimers
+- ✏️ **Custom Rates**: Edit rates and compare official vs. custom deductions side-by-side
 - ⚖️ **Legal Disclaimers**: Proper legal disclaimers included in UI and all exports
-- 🔒 **Privacy First**: All processing happens locally in your browser - no data uploads
+
+### Advanced Filtering
+- 📅 **Flexible Date Selection**: Quick select (Last 30/60/90 days, YTD, Tax Year), by month, quarterly, or custom multi-month
+- 🏷️ **Purpose Filtering**: Filter trips by category or show only unassigned trips
+- ✅ **Bulk Assignment**: Select multiple trips and assign purposes at once
+- ⚙️ **Default Purpose**: Set a default category for newly uploaded trips
+
+### Export Capabilities
+- 📑 **Excel Export**: Comprehensive reports with trip details, monthly summaries, IRS rates, and estimated deductions
+- 📄 **IRS-Ready PDFs**: Professional PDF reports formatted for tax documentation with rate information and disclaimers
+- 🎨 **Color-Coded**: Purpose categories are color-coded across UI and exports
+
+### Geocoding System
+- 🌐 **LocationIQ API**: Production-grade geocoding with higher rate limits
+- 💾 **Smart Caching**: Multi-layer caching (memory + browser localStorage) minimizes API calls
+- 📈 **Geocoding Stats**: Transparency panel showing API calls vs. cache hits
+- 🔄 **Force Refresh**: Clear cache and re-fetch addresses when needed
+- ⏱️ **Progress Tracking**: Visual progress bar with estimated time remaining
+
+### User Experience
+- 🌓 **Dark/Light Mode**: Toggle between themes with system preference detection
+- 📱 **Responsive Design**: Mobile-optimized with hamburger menu navigation
+- 🎯 **Interactive Demo**: Try the app with sample data on the landing page
+- 📚 **Educational Content**: FAQ, IRS guide, and Timeline download instructions
 
 ## Tech Stack
 
@@ -28,6 +55,8 @@ MilesFocus is a professional web application that extracts driving mileage from 
 - **Excel Export**: SheetJS (xlsx)
 - **PDF Export**: jsPDF + jspdf-autotable
 - **Icons**: Lucide React
+- **Geocoding**: LocationIQ API
+- **Hosting**: Vercel
 
 ## AI-Focus Brand Colors
 
@@ -60,6 +89,16 @@ npm run dev
 
 The application will be available at `http://localhost:8080`
 
+### Environment Variables
+
+For production deployment with geocoding:
+
+```bash
+VITE_LOCATIONIQ_API_KEY=your_locationiq_api_key
+```
+
+Configure this in your Vercel project settings under Environment Variables.
+
 ### Building for Production
 
 ```bash
@@ -77,53 +116,58 @@ npm run build
    - Open the application
    - Drag & drop or select your `location-history.json` file
    - Wait for the parser to extract driving segments
+   - Watch the geocoding progress with estimated time remaining
 
 3. **Review & Categorize**
    - Review the extracted trips in the interactive table
+   - Check geocoding stats to see API usage vs. cache hits
    - Set each trip's purpose using the dropdown (Business, Personal, Medical, Charitable, Other)
+   - Use bulk assignment for multiple trips with the same purpose
    - Add notes as needed
-   - Filter by month to focus on specific periods
+   - Use flexible date range selector to filter by period
 
 4. **Review IRS Rates & Estimated Deductions**
    - View current IRS standard mileage rates
+   - Edit rates if needed (labeled as "Custom Rates")
+   - Compare official vs. custom rate deductions
    - See estimated business mileage deductions automatically calculated
-   - Based on official IRS rates that update annually
 
 5. **Export Reports**
    - **Excel**: Complete trip log with separate sheets including trips, monthly summaries, IRS rates, and estimated deductions
    - **PDF**: IRS-ready format showing business trips, monthly totals, rate information, and estimated deductions with legal disclaimers
 
-## Data Structure
+## Project Structure
 
-### Normalized Trip Object
-
-```typescript
-{
-  id: string;
-  date: string; // YYYY-MM-DD
-  startTimeLocal: string;
-  endTimeLocal: string;
-  durationMinutes: number;
-  distanceMiles: number; // Converted from meters
-  startCoord: string; // geo:lat,lon format
-  endCoord: string;
-  purpose: "Business" | "Personal" | "Medical" | "Charitable" | "Other" | "Unassigned";
-  notes: string;
-}
 ```
-
-### Monthly Summary
-
-```typescript
-{
-  month: string; // YYYY-MM
-  businessMiles: number;
-  personalMiles: number;
-  medicalMiles: number;
-  charitableMiles: number;
-  otherMiles: number;
-  totalMiles: number;
-}
+src/
+├── assets/           # Logo and static assets
+├── components/       # React components
+│   ├── Header.tsx
+│   ├── FileUpload.tsx
+│   ├── TripsTable.tsx
+│   ├── MonthlySummary.tsx
+│   ├── IRSRatesPanel.tsx
+│   ├── EstimatedDeduction.tsx
+│   ├── DeductionComparison.tsx
+│   ├── DateRangeSelector.tsx
+│   ├── GeocodingStats.tsx
+│   ├── DemoViewer.tsx
+│   └── Footer.tsx
+├── config/          # Configuration files
+│   └── irsRates.ts  # IRS mileage rates (update annually)
+├── types/           # TypeScript type definitions
+│   └── trip.ts
+├── utils/           # Utility functions
+│   ├── timelineParser.ts  # JSON parsing + geocoding logic
+│   ├── excelExport.ts     # Excel generation
+│   └── pdfExport.ts       # PDF generation
+└── pages/
+    ├── Landing.tsx   # Marketing landing page
+    ├── Index.tsx     # Main application page
+    ├── FAQ.tsx       # Frequently asked questions
+    ├── HowItWorks.tsx # IRS mileage education
+    ├── About.tsx     # About MilesFocus
+    └── Guide.tsx     # Timeline download guide
 ```
 
 ## IRS Rate Management
@@ -155,29 +199,20 @@ When the IRS publishes new rates (typically in December for the following year):
 ### Official Source
 Rates are sourced from: [IRS Standard Mileage Rates](https://www.irs.gov/tax-professionals/standard-mileage-rates)
 
-## Architecture
+## Deployment
 
-```
-src/
-├── assets/           # Logo and static assets
-├── components/       # React components
-│   ├── Header.tsx
-│   ├── FileUpload.tsx
-│   ├── TripsTable.tsx
-│   ├── MonthlySummary.tsx
-│   ├── IRSRatesPanel.tsx
-│   ├── EstimatedDeduction.tsx
-│   └── Footer.tsx
-├── config/          # Configuration files
-│   └── irsRates.ts  # IRS mileage rates (update annually)
-├── types/           # TypeScript type definitions
-│   └── trip.ts
-├── utils/           # Utility functions
-│   ├── timelineParser.ts  # JSON parsing logic
-│   ├── excelExport.ts     # Excel generation
-│   └── pdfExport.ts       # PDF generation
-└── pages/
-    └── Index.tsx    # Main application page
+### Vercel (Recommended)
+
+1. Connect your GitHub repository to Vercel
+2. Add environment variable `VITE_LOCATIONIQ_API_KEY` in project settings
+3. Configure LocationIQ HTTP Referrer restrictions for your domains
+4. Deploy automatically on push
+
+The `vercel.json` file handles SPA routing:
+```json
+{
+  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+}
 ```
 
 ## Future Roadmap (SaaS Features)
@@ -191,6 +226,7 @@ src/
 - 👥 **Multi-User**: Team/business accounts with role management
 - 🔗 **Integrations**: QuickBooks, Xero, and other accounting software
 - 📧 **Scheduled Reports**: Automatic monthly email reports
+- 🤖 **AI Suggestions**: ML-based trip purpose prediction
 
 ## Privacy & Security
 
@@ -198,6 +234,7 @@ src/
 - **No data storage**: Files are not saved or transmitted
 - **No tracking**: No analytics or user tracking
 - **Open source**: Fully transparent code
+- **API key security**: LocationIQ key restricted by HTTP referrer
 
 ## License
 
@@ -209,4 +246,5 @@ For support or questions, please contact AI-Focus Technologies.
 
 ---
 
-**Built with ❤️ by AI-Focus Technologies**
+**Built with ❤️ by AI-Focus Technologies**  
+[www.ai-focus.org](https://www.ai-focus.org) | [www.sujitg.com](https://www.sujitg.com)
