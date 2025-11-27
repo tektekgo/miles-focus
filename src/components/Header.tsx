@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import logo from "@/assets/ai-focus-logo.png";
+import milesFocusLogo from "@/assets/miles-focus-logo-notext.png";
 
 export const Header = () => {
   return (
@@ -17,8 +18,8 @@ export const Header = () => {
           </Link>
 
           {/* Logo and title */}
-          <Link to="/" className="flex items-center gap-6 hover:opacity-90 transition-opacity">
-            <img src={logo} alt="AI-Focus Technologies" className="h-16 md:h-24 w-auto" />
+          <Link to="/" className="flex items-center gap-4 md:gap-6 hover:opacity-90 transition-opacity">
+            <img src={milesFocusLogo} alt="MilesFocus" className="h-12 md:h-16 w-auto" />
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-white">MilesFocus</h1>
               <p className="text-sm md:text-base text-white/80">Mileage Tracking Made Simple</p>
