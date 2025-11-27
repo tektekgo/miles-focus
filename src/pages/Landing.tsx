@@ -71,56 +71,61 @@ const Landing = () => {
           <div className="md:hidden">
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="hover-scale">
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                <SheetHeader>
+                <SheetHeader className="animate-fade-in">
                   <SheetTitle>Navigation</SheetTitle>
                 </SheetHeader>
                 <nav className="flex flex-col gap-4 mt-8">
                   <Link 
                     to="/app" 
                     onClick={() => setMobileMenuOpen(false)}
-                    className="text-lg font-semibold hover:text-primary transition-colors"
+                    className="text-lg font-semibold hover:text-primary transition-all duration-300 animate-fade-in hover:translate-x-1"
+                    style={{ animationDelay: "0.1s" }}
                   >
                     Get Started
                   </Link>
-                  <div className="border-t pt-4">
+                  <div className="border-t pt-4 animate-fade-in" style={{ animationDelay: "0.2s" }}>
                     <p className="text-sm font-semibold text-muted-foreground mb-3">Resources</p>
                     <div className="flex flex-col gap-3 pl-3">
                       <Link 
                         to="/how-it-works" 
                         onClick={() => setMobileMenuOpen(false)}
-                        className="text-base hover:text-primary transition-colors"
+                        className="text-base hover:text-primary transition-all duration-300 animate-fade-in hover:translate-x-1"
+                        style={{ animationDelay: "0.3s" }}
                       >
                         How IRS Mileage Works
                       </Link>
                       <Link 
                         to="/faq" 
                         onClick={() => setMobileMenuOpen(false)}
-                        className="text-base hover:text-primary transition-colors"
+                        className="text-base hover:text-primary transition-all duration-300 animate-fade-in hover:translate-x-1"
+                        style={{ animationDelay: "0.35s" }}
                       >
                         FAQ
                       </Link>
                       <Link 
                         to="/about" 
                         onClick={() => setMobileMenuOpen(false)}
-                        className="text-base hover:text-primary transition-colors"
+                        className="text-base hover:text-primary transition-all duration-300 animate-fade-in hover:translate-x-1"
+                        style={{ animationDelay: "0.4s" }}
                       >
                         About MilesFocus
                       </Link>
                     </div>
                   </div>
-                  <div className="border-t pt-4">
+                  <div className="border-t pt-4 animate-fade-in" style={{ animationDelay: "0.45s" }}>
                     <p className="text-sm font-semibold text-muted-foreground mb-3">Company</p>
                     <div className="flex flex-col gap-3 pl-3">
                       <a 
                         href="https://www.ai-focus.org" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-base hover:text-primary transition-colors"
+                        className="text-base hover:text-primary transition-all duration-300 animate-fade-in hover:translate-x-1"
+                        style={{ animationDelay: "0.5s" }}
                       >
                         AI-Focus Technologies
                       </a>
@@ -128,7 +133,8 @@ const Landing = () => {
                         href="https://www.sujitg.com" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-base hover:text-primary transition-colors"
+                        className="text-base hover:text-primary transition-all duration-300 animate-fade-in hover:translate-x-1"
+                        style={{ animationDelay: "0.55s" }}
                       >
                         About the Developer
                       </a>
