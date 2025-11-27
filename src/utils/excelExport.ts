@@ -1,5 +1,6 @@
 import * as XLSX from "xlsx";
 import { NormalizedTrip, MonthlySummary, TripPurpose } from "@/types/trip";
+import { CURRENT_IRS_RATES, calculateDeduction } from "@/config/irsRates";
 
 // AI-Focus brand colors
 const NAVY_BLUE = "15314D"; // RGB(21, 49, 77)
@@ -93,6 +94,35 @@ export function exportToExcel(
     { wch: 20 }, // End Coord
   ];
   
+  // Add disclaimer footer to Trips sheet
+  const tripsLastDataRow = 4 + filteredTrips.length;
+  const tripsDisclaimerRow = tripsLastDataRow + 2;
+  
+  XLSX.utils.sheet_add_aoa(ws1, [
+    [""],
+    ["LEGAL DISCLAIMER:"],
+    ["MilesFocus provides mileage calculations based on publicly available IRS mileage rates."],
+    ["This tool does not provide tax, legal, or financial advice. All deduction amounts shown are estimates only."],
+    ["Please consult a qualified tax professional for personalized guidance."]
+  ], { origin: `A${tripsDisclaimerRow}` });
+  
+  // Style trips disclaimer
+  const tripsDisclaimerHeaderCell = `A${tripsDisclaimerRow + 1}`;
+  if (ws1[tripsDisclaimerHeaderCell]) {
+    ws1[tripsDisclaimerHeaderCell].s = {
+      font: { bold: true, sz: 10, color: { rgb: DARK_GREY } },
+    };
+  }
+  
+  for (let i = 0; i < 3; i++) {
+    const cellAddress = `A${tripsDisclaimerRow + 2 + i}`;
+    if (ws1[cellAddress]) {
+      ws1[cellAddress].s = {
+        font: { sz: 9, color: { rgb: GREY } },
+      };
+    }
+  }
+  
   XLSX.utils.book_append_sheet(wb, ws1, "Trips");
   
   // Sheet 2: Monthly Summary with branding
@@ -110,6 +140,8 @@ export function exportToExcel(
     "Charitable Miles": s.charitableMiles.toFixed(2),
     "Other Miles": s.otherMiles.toFixed(2),
     "Total Miles": s.totalMiles.toFixed(2),
+    "IRS Business Rate": `$${CURRENT_IRS_RATES.business.toFixed(2)}`,
+    "Estimated Deduction": `$${calculateDeduction(s.businessMiles, CURRENT_IRS_RATES.business).toFixed(2)}`,
   }));
   
   // Combine branding and summary data
@@ -147,7 +179,39 @@ export function exportToExcel(
     { wch: 18 },
     { wch: 14 },
     { wch: 14 },
+    { wch: 18 },
+    { wch: 20 },
   ];
+  
+  // Add disclaimer footer rows
+  const lastDataRow = 3 + summaryData.length;
+  const disclaimerRow = lastDataRow + 2;
+  
+  XLSX.utils.sheet_add_aoa(ws2, [
+    [""],
+    ["LEGAL DISCLAIMER:"],
+    ["MilesFocus provides mileage calculations based on publicly available IRS mileage rates."],
+    ["This tool does not provide tax, legal, or financial advice. All deduction amounts shown are estimates only."],
+    ["Please consult a qualified tax professional for personalized guidance."]
+  ], { origin: `A${disclaimerRow}` });
+  
+  // Style disclaimer header
+  const disclaimerHeaderCell = `A${disclaimerRow + 1}`;
+  if (ws2[disclaimerHeaderCell]) {
+    ws2[disclaimerHeaderCell].s = {
+      font: { bold: true, sz: 10, color: { rgb: DARK_GREY } },
+    };
+  }
+  
+  // Style disclaimer text
+  for (let i = 0; i < 3; i++) {
+    const cellAddress = `A${disclaimerRow + 2 + i}`;
+    if (ws2[cellAddress]) {
+      ws2[cellAddress].s = {
+        font: { sz: 9, color: { rgb: GREY } },
+      };
+    }
+  }
   
   XLSX.utils.book_append_sheet(wb, ws2, "Monthly Summary");
   
