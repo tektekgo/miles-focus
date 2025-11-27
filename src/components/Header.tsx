@@ -3,7 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import logo from "@/assets/ai-focus-logo.png";
-import milesFocusLogo from "@/assets/miles-focus-logo-notext.png";
+import milesFocusLogo from "@/assets/miles-focus-logo-v1-notext.png";
 
 export const Header = () => {
   return (

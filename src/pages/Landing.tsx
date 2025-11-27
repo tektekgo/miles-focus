@@ -25,7 +25,7 @@ import {
 import { FileUp, BarChart3, FileText, Shield, ArrowRight, CheckCircle, ChevronDown, Menu, Download, PlayCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import logoUrl from "@/assets/ai-focus-logo.png";
-import milesFocusLogo from "@/assets/miles-focus-logo-notext.png";
+import milesFocusLogo from "@/assets/miles-focus-logo-v1-notext.png";
 import { DemoViewer } from "@/components/DemoViewer";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
