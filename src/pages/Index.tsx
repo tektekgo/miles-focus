@@ -18,9 +18,15 @@ const Index = () => {
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
   const { toast } = useToast();
 
-  const handleDataLoaded = (data: GoogleTimelineActivity[]) => {
+  const handleDataLoaded = async (data: GoogleTimelineActivity[]) => {
     setRawData(data);
-    const parsedTrips = parseGoogleTimeline(data);
+    
+    toast({
+      title: "Processing...",
+      description: "Extracting trips and geocoding addresses...",
+    });
+    
+    const parsedTrips = await parseGoogleTimeline(data);
     setTrips(parsedTrips);
     
     toast({

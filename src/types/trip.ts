@@ -9,6 +9,8 @@ export interface NormalizedTrip {
   distanceMiles: number;
   startCoord: string;
   endCoord: string;
+  startAddress: string;
+  endAddress: string;
   purpose: TripPurpose;
   notes: string;
 }
