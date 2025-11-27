@@ -14,9 +14,18 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { FileUp, BarChart3, FileText, Shield, ArrowRight, CheckCircle, ChevronDown, Menu, Download } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { FileUp, BarChart3, FileText, Shield, ArrowRight, CheckCircle, ChevronDown, Menu, Download, PlayCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import logoUrl from "@/assets/ai-focus-logo.png";
+import { DemoViewer } from "@/components/DemoViewer";
 
 const Landing = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -195,11 +204,23 @@ const Landing = () => {
                 Start Tracking Mileage <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <a href="https://www.ai-focus.org" target="_blank" rel="noopener noreferrer">
-              <Button size="lg" variant="outline" className="text-lg px-8">
-                Learn About AI-Focus
-              </Button>
-            </a>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button size="lg" variant="outline" className="text-lg px-8">
+                  <PlayCircle className="mr-2 h-5 w-5" />
+                  Try Interactive Demo
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl">See MilesFocus in Action</DialogTitle>
+                  <DialogDescription>
+                    Play with sample data to see how trip categorization and deduction calculations work
+                  </DialogDescription>
+                </DialogHeader>
+                <DemoViewer />
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </section>
