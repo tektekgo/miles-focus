@@ -15,9 +15,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { FileSpreadsheet, FileText, Filter, AlertCircle, ListFilter } from "lucide-react";
+import { FileSpreadsheet, FileText, Filter, AlertCircle, ListFilter, RefreshCw } from "lucide-react";
 import { GoogleTimelineActivity, NormalizedTrip, TripPurpose } from "@/types/trip";
-import { parseGoogleTimeline, calculateMonthlySummaries, getGeocodingStats, GeocodingStats as GeocodingStatsType } from "@/utils/timelineParser";
+import { 
+  parseGoogleTimeline, 
+  calculateMonthlySummaries, 
+  getGeocodingStats, 
+  GeocodingStats as GeocodingStatsType,
+  GeocodingProgress,
+  clearGeocodingCache,
+  setBypassBrowserCache,
+  getGeocodingCacheSize
+} from "@/utils/timelineParser";
 import { exportToExcel } from "@/utils/excelExport";
 import { exportToPDF } from "@/utils/pdfExport";
 import { useToast } from "@/hooks/use-toast";
@@ -32,11 +41,54 @@ const Index = () => {
   const [defaultPurpose, setDefaultPurpose] = useState<TripPurpose>("Unassigned");
   const [customRates, setCustomRates] = useState<IRSRates | null>(null);
   const [isGeocoding, setIsGeocoding] = useState(false);
-  const [geocodingProgress, setGeocodingProgress] = useState({ current: 0, total: 0 });
+  const [geocodingProgress, setGeocodingProgress] = useState<GeocodingProgress>({ 
+    current: 0, 
+    total: 0, 
+    remaining: 0, 
+    estimatedSecondsRemaining: 0 
+  });
   const [geocodingStats, setGeocodingStats] = useState<GeocodingStatsType | null>(null);
+  const [forceRefresh, setForceRefresh] = useState(false);
   const { toast } = useToast();
   
   const allPurposes: TripPurpose[] = ["Business", "Personal", "Medical", "Charitable", "Other", "Unassigned"];
+
+  const handleClearCacheAndReload = async () => {
+    if (!rawData) return;
+    
+    // Clear memory cache
+    clearGeocodingCache();
+    // Enable browser cache bypass
+    setBypassBrowserCache(true);
+    setForceRefresh(true);
+    
+    toast({
+      title: "Cache Cleared",
+      description: "Reloading with fresh geocoding...",
+    });
+    
+    // Re-process the data
+    setIsGeocoding(true);
+    setGeocodingStats(null);
+    
+    const newTrips = await parseGoogleTimeline(rawData, defaultPurpose, (progress) => {
+      setGeocodingProgress(progress);
+    });
+    
+    setTrips(newTrips);
+    setIsGeocoding(false);
+    setGeocodingProgress({ current: 0, total: 0, remaining: 0, estimatedSecondsRemaining: 0 });
+    setGeocodingStats(getGeocodingStats());
+    
+    // Reset bypass flag
+    setBypassBrowserCache(false);
+    setForceRefresh(false);
+    
+    toast({
+      title: "Fresh Geocoding Complete!",
+      description: `Processed ${newTrips.length} trips with fresh API calls.`,
+    });
+  };
 
   const handleDataLoaded = async (data: GoogleTimelineActivity[]) => {
     setRawData(data);
@@ -48,13 +100,13 @@ const Index = () => {
       description: "Extracting trips and geocoding addresses...",
     });
     
-    const parsedTrips = await parseGoogleTimeline(data, defaultPurpose, (current, total) => {
-      setGeocodingProgress({ current, total });
+    const parsedTrips = await parseGoogleTimeline(data, defaultPurpose, (progress) => {
+      setGeocodingProgress(progress);
     });
     
     setTrips(parsedTrips);
     setIsGeocoding(false);
-    setGeocodingProgress({ current: 0, total: 0 });
+    setGeocodingProgress({ current: 0, total: 0, remaining: 0, estimatedSecondsRemaining: 0 });
     setGeocodingStats(getGeocodingStats());
     
     toast({
@@ -72,6 +124,14 @@ const Index = () => {
   const summaries = trips.length > 0 ? calculateMonthlySummaries(trips) : [];
   
   const availableMonths = ["all", ...summaries.map(s => s.month)];
+
+  // Format ETA in human-readable format
+  const formatETA = (seconds: number): string => {
+    if (seconds < 60) return `${seconds}s`;
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
+  };
 
   // Helper to get filtered months from date range selection
   const getFilteredMonths = (): string[] => {
@@ -212,11 +272,19 @@ const Index = () => {
                 <div className="flex items-center gap-4">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-foreground mb-1">
-                      Geocoding Addresses...
-                    </h3>
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="font-semibold text-foreground">
+                        {forceRefresh ? "Fresh Geocoding..." : "Geocoding Addresses..."}
+                      </h3>
+                      {geocodingProgress.estimatedSecondsRemaining > 0 && (
+                        <span className="text-sm font-medium text-primary">
+                          ~{formatETA(geocodingProgress.estimatedSecondsRemaining)} remaining
+                        </span>
+                      )}
+                    </div>
                     <p className="text-sm text-muted-foreground">
                       Processing {geocodingProgress.current} of {geocodingProgress.total} addresses
+                      {geocodingProgress.remaining > 0 && ` (${geocodingProgress.remaining} to fetch)`}
                     </p>
                     <div className="mt-2 w-full bg-muted rounded-full h-2">
                       <div 
@@ -232,7 +300,21 @@ const Index = () => {
             )}
             
             {!isGeocoding && geocodingStats && (
-              <GeocodingStats stats={geocodingStats} />
+              <div className="space-y-3">
+                <GeocodingStats stats={geocodingStats} />
+                <div className="flex justify-end">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={handleClearCacheAndReload}
+                    disabled={isGeocoding}
+                    className="gap-2"
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                    Force Fresh Geocoding
+                  </Button>
+                </div>
+              </div>
             )}
             
             {!isGeocoding && (
