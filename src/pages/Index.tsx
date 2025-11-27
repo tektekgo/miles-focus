@@ -5,6 +5,7 @@ import { TripsTable } from "@/components/TripsTable";
 import { MonthlySummary } from "@/components/MonthlySummary";
 import { IRSRatesPanel } from "@/components/IRSRatesPanel";
 import { EstimatedDeduction } from "@/components/EstimatedDeduction";
+import { DeductionComparison } from "@/components/DeductionComparison";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -270,6 +271,17 @@ const Index = () => {
               customRates={customRates}
               onRatesChange={setCustomRates}
             />
+            
+            {customRates && (
+              <DeductionComparison
+                businessMiles={
+                  selectedMonth === "all" 
+                    ? summaries.reduce((sum, s) => sum + s.businessMiles, 0)
+                    : summaries.find(s => s.month === selectedMonth)?.businessMiles || 0
+                }
+                customRates={customRates}
+              />
+            )}
             
             <EstimatedDeduction 
               businessMiles={
