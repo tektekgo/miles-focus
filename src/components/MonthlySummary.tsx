@@ -41,31 +41,41 @@ export const MonthlySummary = ({ summaries, selectedMonth }: MonthlySummaryProps
       label: "Business", 
       value: currentSummary.businessMiles, 
       icon: Briefcase,
-      color: "text-primary" 
+      bgColor: "bg-blue-50 border-blue-200",
+      textColor: "text-blue-900",
+      valueColor: "text-blue-700"
     },
     { 
       label: "Personal", 
       value: currentSummary.personalMiles, 
       icon: User,
-      color: "text-secondary" 
+      bgColor: "bg-gray-50 border-gray-200",
+      textColor: "text-gray-900",
+      valueColor: "text-gray-700"
     },
     { 
       label: "Medical", 
       value: currentSummary.medicalMiles, 
       icon: Heart,
-      color: "text-destructive" 
+      bgColor: "bg-green-50 border-green-200",
+      textColor: "text-green-900",
+      valueColor: "text-green-700"
     },
     { 
       label: "Charitable", 
       value: currentSummary.charitableMiles, 
       icon: Gift,
-      color: "text-accent" 
+      bgColor: "bg-purple-50 border-purple-200",
+      textColor: "text-purple-900",
+      valueColor: "text-purple-700"
     },
     { 
       label: "Other", 
       value: currentSummary.otherMiles, 
       icon: FileText,
-      color: "text-muted-foreground" 
+      bgColor: "bg-orange-50 border-orange-200",
+      textColor: "text-orange-900",
+      valueColor: "text-orange-700"
     },
   ];
 
@@ -86,12 +96,12 @@ export const MonthlySummary = ({ summaries, selectedMonth }: MonthlySummaryProps
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <Card key={stat.label} className="p-4">
-              <div className={`flex items-center gap-2 mb-2 ${stat.color}`}>
+            <Card key={stat.label} className={`p-4 ${stat.bgColor}`}>
+              <div className={`flex items-center gap-2 mb-2 ${stat.textColor}`}>
                 <Icon className="h-4 w-4" />
                 <p className="text-sm font-medium">{stat.label}</p>
               </div>
-              <p className="text-2xl font-bold">{stat.value.toFixed(2)}</p>
+              <p className={`text-2xl font-bold ${stat.valueColor}`}>{stat.value.toFixed(2)}</p>
               <p className="text-xs text-muted-foreground">miles</p>
             </Card>
           );
