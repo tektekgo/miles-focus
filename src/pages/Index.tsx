@@ -1,12 +1,171 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { Header } from "@/components/Header";
+import { FileUpload } from "@/components/FileUpload";
+import { TripsTable } from "@/components/TripsTable";
+import { MonthlySummary } from "@/components/MonthlySummary";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Download, FileSpreadsheet, FileText } from "lucide-react";
+import { GoogleTimelineActivity, NormalizedTrip } from "@/types/trip";
+import { parseGoogleTimeline, calculateMonthlySummaries } from "@/utils/timelineParser";
+import { exportToExcel } from "@/utils/excelExport";
+import { exportToPDF } from "@/utils/pdfExport";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
+  const [rawData, setRawData] = useState<GoogleTimelineActivity[] | null>(null);
+  const [trips, setTrips] = useState<NormalizedTrip[]>([]);
+  const [selectedMonth, setSelectedMonth] = useState<string>("all");
+  const { toast } = useToast();
+
+  const handleDataLoaded = (data: GoogleTimelineActivity[]) => {
+    setRawData(data);
+    const parsedTrips = parseGoogleTimeline(data);
+    setTrips(parsedTrips);
+    
+    toast({
+      title: "Trips Extracted!",
+      description: `Found ${parsedTrips.length} driving trips in your timeline.`,
+    });
+  };
+
+  const handleTripUpdate = (tripId: string, updates: Partial<NormalizedTrip>) => {
+    setTrips(prev => 
+      prev.map(trip => trip.id === tripId ? { ...trip, ...updates } : trip)
+    );
+  };
+
+  const summaries = trips.length > 0 ? calculateMonthlySummaries(trips) : [];
+  
+  const availableMonths = ["all", ...summaries.map(s => s.month)];
+
+  const handleExportExcel = () => {
+    if (trips.length === 0) {
+      toast({
+        title: "No Data",
+        description: "Please upload a timeline file first.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    exportToExcel(trips, summaries);
+    toast({
+      title: "Excel Exported!",
+      description: "Your mileage report has been downloaded.",
+    });
+  };
+
+  const handleExportPDF = () => {
+    if (trips.length === 0) {
+      toast({
+        title: "No Data",
+        description: "Please upload a timeline file first.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    exportToPDF(trips, summaries, selectedMonth === "all" ? "" : selectedMonth);
+    toast({
+      title: "PDF Exported!",
+      description: "Your IRS-ready report has been downloaded.",
+    });
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen flex flex-col bg-background">
+      <Header />
+      
+      <main className="flex-1 container mx-auto px-4 py-8">
+        {!rawData ? (
+          <div className="max-w-2xl mx-auto mt-12">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-foreground mb-3">
+                Welcome to MilesFocus
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Extract and organize your driving mileage from Google Timeline
+              </p>
+            </div>
+            <FileUpload onDataLoaded={handleDataLoaded} />
+            
+            <div className="mt-12 space-y-4 text-sm text-muted-foreground">
+              <h3 className="font-semibold text-foreground">How it works:</h3>
+              <ol className="list-decimal list-inside space-y-2 ml-2">
+                <li>Export your Google Timeline data as JSON</li>
+                <li>Upload the file using the form above</li>
+                <li>Review and categorize your trips</li>
+                <li>Export IRS-ready reports in PDF or Excel format</li>
+              </ol>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground">Your Trips</h2>
+                <p className="text-muted-foreground">
+                  {trips.length} driving trips extracted
+                </p>
+              </div>
+              
+              <div className="flex flex-wrap items-center gap-3">
+                <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select month" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableMonths.map(month => (
+                      <SelectItem key={month} value={month}>
+                        {month === "all" ? "All Months" : month}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
+                <Button onClick={handleExportExcel} variant="outline">
+                  <FileSpreadsheet className="mr-2 h-4 w-4" />
+                  Export Excel
+                </Button>
+                
+                <Button onClick={handleExportPDF} variant="default">
+                  <FileText className="mr-2 h-4 w-4" />
+                  Export IRS PDF
+                </Button>
+              </div>
+            </div>
+
+            <MonthlySummary summaries={summaries} selectedMonth={selectedMonth} />
+            
+            <TripsTable 
+              trips={trips} 
+              onTripUpdate={handleTripUpdate}
+              selectedMonth={selectedMonth}
+            />
+
+            <div className="flex justify-center pt-4">
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setRawData(null);
+                  setTrips([]);
+                  setSelectedMonth("all");
+                }}
+              >
+                Upload Different File
+              </Button>
+            </div>
+          </div>
+        )}
+      </main>
+
+      <footer className="border-t py-6 bg-card">
+        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
+          <p>© 2025 AI-Focus Technologies • MilesFocus</p>
+          <p className="mt-1">Your data is processed locally and never leaves your device.</p>
+        </div>
+      </footer>
     </div>
   );
 };

@@ -1,73 +1,170 @@
-# Welcome to your Lovable project
+# MilesFocus
 
-## Project info
+**AI-Focus Technologies Branded Mileage Extractor**
 
-**URL**: https://lovable.dev/projects/7551568f-92a7-4d9b-b11c-9861e7206201
+MilesFocus is a professional web application that extracts driving mileage from Google Timeline JSON exports and generates IRS-ready reports in both PDF and Excel formats.
 
-## How can I edit this code?
+![AI-Focus Technologies](src/assets/ai-focus-logo.png)
 
-There are several ways of editing your application.
+## Features
 
-**Use Lovable**
+- 📤 **Simple Upload**: Drag & drop or select your Google Timeline JSON file
+- 🚗 **Smart Extraction**: Automatically identifies and extracts only driving segments
+- ✏️ **Interactive Review**: Edit trip purposes and add notes directly in the table
+- 📊 **Monthly Summaries**: View mileage breakdowns by category (Business, Personal, Medical, Charitable, Other)
+- 📑 **Excel Export**: Generate comprehensive reports with trip details and monthly summaries
+- 📄 **IRS-Ready PDFs**: Professional PDF reports formatted for tax documentation
+- 🔒 **Privacy First**: All processing happens locally in your browser - no data uploads
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/7551568f-92a7-4d9b-b11c-9861e7206201) and start prompting.
+## Tech Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Frontend**: React 18 + TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS with AI-Focus brand colors
+- **UI Components**: shadcn/ui
+- **Excel Export**: SheetJS (xlsx)
+- **PDF Export**: jsPDF + jspdf-autotable
+- **Icons**: Lucide React
 
-**Use your preferred IDE**
+## AI-Focus Brand Colors
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Navy Blue**: #15314D (Primary)
+- **Grey**: #919CA7 (Secondary)
+- **Dark Grey**: #404040 (Neutral)
+- **Orange**: Accent color for highlights
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Getting Started
 
-Follow these steps:
+### Prerequisites
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- Node.js 18+ and npm
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Installation
 
-# Step 3: Install the necessary dependencies.
-npm i
+```bash
+# Clone the repository
+git clone https://github.com/tektekgo/milesfocus.git
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Navigate to project directory
+cd milesfocus
+
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The application will be available at `http://localhost:8080`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Building for Production
 
-**Use GitHub Codespaces**
+```bash
+npm run build
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## How to Use
 
-## What technologies are used for this project?
+1. **Export Your Google Timeline**
+   - Go to [Google Takeout](https://takeout.google.com/)
+   - Select "Location History" (JSON format)
+   - Download your data
 
-This project is built with:
+2. **Upload to MilesFocus**
+   - Open the application
+   - Drag & drop or select your `location-history.json` file
+   - Wait for the parser to extract driving segments
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+3. **Review & Categorize**
+   - Review the extracted trips in the interactive table
+   - Set each trip's purpose using the dropdown (Business, Personal, Medical, Charitable, Other)
+   - Add notes as needed
+   - Filter by month to focus on specific periods
 
-## How can I deploy this project?
+4. **Export Reports**
+   - **Excel**: Complete trip log with separate sheets for trips and monthly summaries
+   - **PDF**: IRS-ready format showing business trips and monthly totals
 
-Simply open [Lovable](https://lovable.dev/projects/7551568f-92a7-4d9b-b11c-9861e7206201) and click on Share -> Publish.
+## Data Structure
 
-## Can I connect a custom domain to my Lovable project?
+### Normalized Trip Object
 
-Yes, you can!
+```typescript
+{
+  id: string;
+  date: string; // YYYY-MM-DD
+  startTimeLocal: string;
+  endTimeLocal: string;
+  durationMinutes: number;
+  distanceMiles: number; // Converted from meters
+  startCoord: string; // geo:lat,lon format
+  endCoord: string;
+  purpose: "Business" | "Personal" | "Medical" | "Charitable" | "Other" | "Unassigned";
+  notes: string;
+}
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### Monthly Summary
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+```typescript
+{
+  month: string; // YYYY-MM
+  businessMiles: number;
+  personalMiles: number;
+  medicalMiles: number;
+  charitableMiles: number;
+  otherMiles: number;
+  totalMiles: number;
+}
+```
+
+## Architecture
+
+```
+src/
+├── assets/           # Logo and static assets
+├── components/       # React components
+│   ├── Header.tsx
+│   ├── FileUpload.tsx
+│   ├── TripsTable.tsx
+│   └── MonthlySummary.tsx
+├── types/           # TypeScript type definitions
+│   └── trip.ts
+├── utils/           # Utility functions
+│   ├── timelineParser.ts  # JSON parsing logic
+│   ├── excelExport.ts     # Excel generation
+│   └── pdfExport.ts       # PDF generation
+└── pages/
+    └── Index.tsx    # Main application page
+```
+
+## Future Roadmap (SaaS Features)
+
+- 🔐 **User Authentication**: Save and sync trip data across devices
+- ☁️ **Cloud Storage**: Store historical mileage data
+- 📱 **Mobile App**: Native iOS/Android applications
+- 🔄 **Automatic Sync**: Direct integration with Google Timeline API
+- 📈 **Analytics Dashboard**: Yearly trends and insights
+- 🧾 **Tax Estimator**: Calculate potential deductions
+- 👥 **Multi-User**: Team/business accounts with role management
+- 🔗 **Integrations**: QuickBooks, Xero, and other accounting software
+- 📧 **Scheduled Reports**: Automatic monthly email reports
+
+## Privacy & Security
+
+- **No server uploads**: All processing happens in your browser
+- **No data storage**: Files are not saved or transmitted
+- **No tracking**: No analytics or user tracking
+- **Open source**: Fully transparent code
+
+## License
+
+© 2025 AI-Focus Technologies. All rights reserved.
+
+## Support
+
+For support or questions, please contact AI-Focus Technologies.
+
+---
+
+**Built with ❤️ by AI-Focus Technologies**
