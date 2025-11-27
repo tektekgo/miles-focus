@@ -30,17 +30,25 @@ const PURPOSE_TEXT_COLORS: Record<string, string> = {
 export function exportToExcel(
   trips: NormalizedTrip[], 
   summaries: MonthlySummary[], 
-  month: string = "", 
+  months: string[] = [], 
   purposes: TripPurpose[] = ["Business", "Personal", "Medical", "Charitable", "Other", "Unassigned"],
-  customRates: IRSRates | null = null
+  customRates: IRSRates | null = null,
+  rangeLabel: string = "All Months"
 ) {
   const activeRates = customRates || CURRENT_IRS_RATES;
   const isCustom = customRates !== null;
-  // Filter trips by month and purposes
+  // Filter trips by months and purposes
   let filteredTrips = trips;
   
-  if (month) {
-    filteredTrips = filteredTrips.filter(t => t.date.startsWith(month));
+  if (months.length > 0) {
+    filteredTrips = filteredTrips.filter(t => {
+      // Check if trip date matches any of the selected months
+      // Month format from range: "January 2024", trip date format: "January 15, 2024"
+      return months.some(month => {
+        const [monthName, year] = month.split(" ");
+        return t.date.includes(monthName) && t.date.includes(year);
+      });
+    });
   }
   
   filteredTrips = filteredTrips.filter(t => purposes.includes(t.purpose));
@@ -313,8 +321,8 @@ export function exportToExcel(
   XLSX.utils.book_append_sheet(wb, ws2, "Monthly Summary");
   
   // Generate filename with current date
-  const monthSuffix = month ? `-${month}` : "";
-  const filename = `MilesFocus-Report${monthSuffix}-${new Date().toISOString().split('T')[0]}.xlsx`;
+  const sanitizedLabel = rangeLabel.replace(/[^a-zA-Z0-9]/g, "-").replace(/-+/g, "-");
+  const filename = `MilesFocus-Report-${sanitizedLabel}-${new Date().toISOString().split('T')[0]}.xlsx`;
   
   // Write file with styling enabled
   XLSX.writeFile(wb, filename, { cellStyles: true });

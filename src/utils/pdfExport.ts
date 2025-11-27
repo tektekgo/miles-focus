@@ -7,9 +7,10 @@ import { CURRENT_IRS_RATES, calculateDeduction, formatRate, IRSRates } from "@/c
 export function exportToPDF(
   trips: NormalizedTrip[], 
   summaries: MonthlySummary[], 
-  month: string,
+  months: string[],
   purposes: TripPurpose[] = ["Business", "Personal", "Medical", "Charitable", "Other", "Unassigned"],
-  customRates: IRSRates | null = null
+  customRates: IRSRates | null = null,
+  rangeLabel: string = "All Months"
 ) {
   const activeRates = customRates || CURRENT_IRS_RATES;
   const isCustom = customRates !== null;
@@ -41,13 +42,17 @@ export function exportToPDF(
   // Title
   doc.setTextColor(navyBlue[0], navyBlue[1], navyBlue[2]);
   doc.setFontSize(16);
-  const monthDisplay = month || "All Months";
-  doc.text(`Mileage Log - ${monthDisplay}`, 15, 48);
+  doc.text(`Mileage Log - ${rangeLabel}`, 15, 48);
   
-  // Filter trips by month and purposes
+  // Filter trips by months and purposes
   let filteredTrips = trips;
-  if (month && month !== "all") {
-    filteredTrips = filteredTrips.filter(t => t.date.startsWith(month));
+  if (months.length > 0) {
+    filteredTrips = filteredTrips.filter(t => {
+      return months.some(month => {
+        const [monthName, year] = month.split(" ");
+        return t.date.includes(monthName) && t.date.includes(year);
+      });
+    });
   }
   
   filteredTrips = filteredTrips.filter(t => purposes.includes(t.purpose));
@@ -250,6 +255,7 @@ export function exportToPDF(
   }
   
   // Save the PDF
-  const filename = `MilesFocus-IRS-Report-${month || "All"}-${new Date().toISOString().split('T')[0]}.pdf`;
+  const sanitizedLabel = rangeLabel.replace(/[^a-zA-Z0-9]/g, "-").replace(/-+/g, "-");
+  const filename = `MilesFocus-IRS-Report-${sanitizedLabel}-${new Date().toISOString().split('T')[0]}.pdf`;
   doc.save(filename);
 }
