@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Download, FileSpreadsheet, FileText, Filter, AlertCircle } from "lucide-react";
+import { Download, FileSpreadsheet, FileText, Filter, AlertCircle, ListFilter } from "lucide-react";
 import { GoogleTimelineActivity, NormalizedTrip, TripPurpose } from "@/types/trip";
 import { parseGoogleTimeline, calculateMonthlySummaries } from "@/utils/timelineParser";
 import { exportToExcel } from "@/utils/excelExport";
@@ -20,6 +20,7 @@ const Index = () => {
   const [trips, setTrips] = useState<NormalizedTrip[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
   const [selectedPurposes, setSelectedPurposes] = useState<TripPurpose[]>(["Business", "Personal", "Medical", "Charitable", "Other"]);
+  const [showUnassignedOnly, setShowUnassignedOnly] = useState(false);
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [geocodingProgress, setGeocodingProgress] = useState({ current: 0, total: 0 });
   const { toast } = useToast();
@@ -185,6 +186,15 @@ const Index = () => {
                   </SelectContent>
                 </Select>
                 
+                <Button 
+                  variant={showUnassignedOnly ? "default" : "outline"}
+                  onClick={() => setShowUnassignedOnly(!showUnassignedOnly)}
+                  size="default"
+                >
+                  <ListFilter className="mr-2 h-4 w-4" />
+                  {showUnassignedOnly ? "Show All" : "Unassigned Only"}
+                </Button>
+                
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button variant="outline" size="default">
@@ -232,6 +242,7 @@ const Index = () => {
               trips={trips} 
               onTripUpdate={handleTripUpdate}
               selectedMonth={selectedMonth}
+              showUnassignedOnly={showUnassignedOnly}
             />
 
             <div className="flex justify-center pt-4">
