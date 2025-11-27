@@ -8,6 +8,25 @@ const GREY = "919CA7"; // RGB(145, 156, 167)
 const DARK_GREY = "404040"; // RGB(64, 64, 64)
 const WHITE = "FFFFFF";
 
+// Purpose colors (matching app and PDF)
+const PURPOSE_COLORS: Record<string, string> = {
+  Business: "DBEAFE", // blue-50
+  Medical: "F0FDF4", // green-50
+  Charitable: "FAF5FF", // purple-50
+  Personal: "F9FAFB", // gray-50
+  Other: "FFF7ED", // orange-50
+  Unassigned: "FEF9E8", // yellow-50
+};
+
+const PURPOSE_TEXT_COLORS: Record<string, string> = {
+  Business: "1D4ED8", // blue-700
+  Medical: "15803D", // green-700
+  Charitable: "7E22CE", // purple-700
+  Personal: "374151", // gray-700
+  Other: "C2410C", // orange-700
+  Unassigned: "A16207", // yellow-700
+};
+
 export function exportToExcel(
   trips: NormalizedTrip[], 
   summaries: MonthlySummary[], 
@@ -114,6 +133,23 @@ export function exportToExcel(
     ws1[cellAddress].s = {
       fill: { fgColor: { rgb: NAVY_BLUE } },
       font: { bold: true, color: { rgb: WHITE } },
+      alignment: { vertical: "center", horizontal: "center" }
+    };
+  }
+  
+  // Style Purpose column cells with color-coding (column H, index 7)
+  const purposeColIndex = 7; // "Purpose" is the 8th column (0-indexed)
+  for (let row = 5; row < 5 + filteredTrips.length; row++) {
+    const cellAddress = XLSX.utils.encode_cell({ r: row, c: purposeColIndex });
+    if (!ws1[cellAddress]) continue;
+    
+    const purpose = ws1[cellAddress].v as string;
+    const bgColor = PURPOSE_COLORS[purpose] || WHITE;
+    const textColor = PURPOSE_TEXT_COLORS[purpose] || DARK_GREY;
+    
+    ws1[cellAddress].s = {
+      fill: { fgColor: { rgb: bgColor } },
+      font: { bold: true, color: { rgb: textColor }, sz: 10 },
       alignment: { vertical: "center", horizontal: "center" }
     };
   }
