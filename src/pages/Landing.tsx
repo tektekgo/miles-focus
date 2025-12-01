@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { getVersion } from "@/config/version";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -494,7 +495,10 @@ const Landing = () => {
               >
                 AI-Focus Technologies
               </a>
-              . All rights reserved. Built by{" "}
+              . All rights reserved.
+            </p>
+            <p className="mt-2">
+              MilesFocus {getVersion()} • Built by{" "}
               <a 
                 href="https://www.sujitg.com" 
                 target="_blank" 
