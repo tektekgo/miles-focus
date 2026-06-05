@@ -12,7 +12,7 @@ const HowItWorks = () => {
       <header className="border-b border-white/10 sticky top-0 z-50 shadow-md" style={{ backgroundColor: 'hsl(208, 57%, 21%)' }}>
         <div className="container mx-auto px-4 py-6 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-6 hover:opacity-90 transition-opacity">
-            <img src={logoUrl} alt="AI-Focus Logo" className="h-16 w-16" />
+            <img src={logoUrl} alt="Techsilon Logo" className="h-16 w-16" />
             <div>
               <h1 className="text-3xl font-bold text-white">MilesFocus</h1>
               <p className="text-sm text-white/80">by Techsilon</p>
@@ -279,12 +279,12 @@ const HowItWorks = () => {
           <p>
             © {new Date().getFullYear()}{" "}
             <a 
-              href="https://www.ai-focus.org" 
+              href="https://techsilon.com" 
               target="_blank" 
               rel="noopener noreferrer"
               className="hover:text-primary transition-colors underline"
             >
-              AI-Focus Technologies
+              Techsilon LLC
             </a>
             . All rights reserved. Built by{" "}
             <a 
