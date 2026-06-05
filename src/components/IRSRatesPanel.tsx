@@ -3,8 +3,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ExternalLink, Edit, Check, X } from "lucide-react";
-import { CURRENT_IRS_RATES, IRS_RATES_SOURCE_URL, formatRate, IRSRates } from "@/config/irsRates";
+import {
+  CURRENT_IRS_RATES,
+  CURRENT_YEAR,
+  AVAILABLE_YEARS,
+  getRatesForYear,
+  IRS_RATES_SOURCE_URL,
+  formatRate,
+  IRSRates,
+} from "@/config/irsRates";
 
 interface IRSRatesPanelProps {
   customRates: IRSRates | null;
@@ -14,9 +23,20 @@ interface IRSRatesPanelProps {
 export const IRSRatesPanel = ({ customRates, onRatesChange }: IRSRatesPanelProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedRates, setEditedRates] = useState<IRSRates>(customRates || CURRENT_IRS_RATES);
-  
+
   const activeRates = customRates || CURRENT_IRS_RATES;
-  const isCustom = customRates !== null;
+  const isCustom = customRates !== null && customRates.business !== getRatesForYear(customRates.year).business;
+  const selectedYear = activeRates.year;
+
+  const handleYearChange = (yearStr: string) => {
+    const year = parseInt(yearStr, 10);
+    if (year === CURRENT_YEAR) {
+      onRatesChange(null);
+    } else {
+      onRatesChange(getRatesForYear(year));
+    }
+    setIsEditing(false);
+  };
   
   const handleEdit = () => {
     setEditedRates(activeRates);
