@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Shield, Target, Users, AlertCircle } from "lucide-react";
-import logoUrl from "@/assets/ai-focus-logo.png";
+import logoUrl from "@/assets/miles-focus-logo.png.asset.json";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const About = () => {
@@ -12,7 +12,7 @@ const About = () => {
       <header className="border-b border-white/10 sticky top-0 z-50 shadow-md" style={{ backgroundColor: 'hsl(208, 57%, 21%)' }}>
         <div className="container mx-auto px-4 py-6 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-6 hover:opacity-90 transition-opacity">
-            <img src={logoUrl} alt="Techsilon Logo" className="h-16 w-16" />
+            <img src={logoUrl.url} alt="MilesFocus Logo" className="h-16 w-16" />
             <div>
               <h1 className="text-3xl font-bold text-white">MilesFocus</h1>
               <p className="text-sm text-white/80">by Techsilon</p>
