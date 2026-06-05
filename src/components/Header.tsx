@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import logo from "@/assets/miles-focus-logo.png.asset.json";
 import milesFocusLogo from "@/assets/miles-focus-logo.png.asset.json";
 
 export const Header = () => {
