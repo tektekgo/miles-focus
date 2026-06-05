@@ -25,8 +25,8 @@ import {
 } from "@/components/ui/dialog";
 import { FileUp, BarChart3, FileText, Shield, ArrowRight, CheckCircle, ChevronDown, Menu, Download, PlayCircle } from "lucide-react";
 import { Link } from "react-router-dom";
-import logoUrl from "@/assets/miles-focus-logo.png.asset.json";
 import milesFocusLogo from "@/assets/miles-focus-logo.png.asset.json";
+const logoUrl = milesFocusLogo;
 import { DemoViewer } from "@/components/DemoViewer";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
