@@ -27,7 +27,7 @@ export function exportToPDF(
   
   // Add logo image
   try {
-    doc.addImage(milesFocusLogo, 'PNG', 10, 8, 20, 20);
+    doc.addImage(milesFocusLogo.url, 'PNG', 10, 8, 20, 20);
   } catch (e) {
     console.error('Failed to add logo to PDF:', e);
   }

@@ -39,7 +39,7 @@ const Landing = () => {
       <header className="border-b border-white/10 sticky top-0 z-50 shadow-md" style={{ backgroundColor: 'hsl(208, 57%, 21%)' }}>
         <div className="container mx-auto px-4 py-6 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-4 md:gap-6 hover:opacity-90 transition-opacity">
-            <img src={milesFocusLogo} alt="MilesFocus" className="h-12 md:h-16 w-auto" />
+            <img src={milesFocusLogo.url} alt="MilesFocus" className="h-12 md:h-16 w-auto" />
             <div>
               <h1 className="text-4xl font-bold" style={{ color: '#FFFFFF' }}>MilesFocus</h1>
               <p className="text-base" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>by Techsilon</p>
@@ -411,7 +411,7 @@ const Landing = () => {
             {/* Brand Section */}
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <img src={milesFocusLogo} alt="MilesFocus Logo" className="h-12 w-12" />
+                <img src={milesFocusLogo.url} alt="MilesFocus Logo" className="h-12 w-12" />
                 <h4 className="font-bold text-lg">MilesFocus</h4>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
