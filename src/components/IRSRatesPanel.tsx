@@ -64,29 +64,35 @@ export const IRSRatesPanel = ({ customRates, onRatesChange }: IRSRatesPanelProps
         <div className="flex items-start justify-between">
           <div>
             <CardTitle className="text-xl text-primary">
-              {isCustom ? "Custom Mileage Rates" : `IRS Standard Mileage Rates (Currently ${CURRENT_IRS_RATES.year} Official Rates)`}
+              {isCustom
+                ? `Custom Mileage Rates (${selectedYear})`
+                : `IRS Standard Mileage Rates (${selectedYear}${selectedYear === CURRENT_YEAR ? " — Current" : ""})`}
             </CardTitle>
             <CardDescription>
               Rates used for calculating estimated deductions
             </CardDescription>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 items-center">
+            <Select value={String(selectedYear)} onValueChange={handleYearChange}>
+              <SelectTrigger className="w-[140px] h-9">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {AVAILABLE_YEARS.map((y) => (
+                  <SelectItem key={y} value={String(y)}>
+                    {y}{y === CURRENT_YEAR ? " (current)" : ""}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {!isEditing && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleEdit}
-              >
+              <Button variant="outline" size="sm" onClick={handleEdit}>
                 <Edit className="h-4 w-4 mr-1" />
                 Edit Rates
               </Button>
             )}
             {isCustom && !isEditing && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleReset}
-              >
+              <Button variant="ghost" size="sm" onClick={handleReset}>
                 Reset to Official
               </Button>
             )}
