@@ -12,7 +12,7 @@ const About = () => {
       <header className="border-b border-white/10 sticky top-0 z-50 shadow-md" style={{ backgroundColor: 'hsl(208, 57%, 21%)' }}>
         <div className="container mx-auto px-4 py-6 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-6 hover:opacity-90 transition-opacity">
-            <img src={logoUrl} alt="AI-Focus Logo" className="h-16 w-16" />
+            <img src={logoUrl} alt="Techsilon Logo" className="h-16 w-16" />
             <div>
               <h1 className="text-3xl font-bold text-white">MilesFocus</h1>
               <p className="text-sm text-white/80">by Techsilon</p>
@@ -36,7 +36,7 @@ const About = () => {
 
         <h1 className="text-4xl font-bold mb-4">About MilesFocus</h1>
         <p className="text-xl text-muted-foreground mb-12">
-          A mileage-tracking companion built by AI-Focus Technologies. Our goal is simple: take the friction out of 
+          A mileage-tracking companion built by Techsilon LLC. Our goal is simple: take the friction out of 
           turning your real-world driving into clean, structured mileage records you can actually use.
         </p>
 
@@ -99,12 +99,12 @@ const About = () => {
             <p className="text-muted-foreground text-lg mb-6">
               MilesFocus is created by{" "}
               <a 
-                href="https://www.ai-focus.org" 
+                href="https://techsilon.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-primary hover:underline font-semibold"
               >
-                AI-Focus Technologies
+                Techsilon LLC
               </a>
               , a boutique initiative focused on practical, real-world automation and AI-assisted tools.
             </p>
@@ -211,12 +211,12 @@ const About = () => {
             <p className="text-lg text-muted-foreground mb-8">
               MilesFocus is part of the broader{" "}
               <a 
-                href="https://www.ai-focus.org" 
+                href="https://techsilon.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-primary hover:underline font-semibold"
               >
-                AI-Focus ecosystem
+                Techsilon ecosystem
               </a>
               : tools and training that combine automation, AI, and practical engineering to make real work simpler.
             </p>
@@ -246,12 +246,12 @@ const About = () => {
           <p>
             © {new Date().getFullYear()}{" "}
             <a 
-              href="https://www.ai-focus.org" 
+              href="https://techsilon.com" 
               target="_blank" 
               rel="noopener noreferrer"
               className="hover:text-primary transition-colors underline"
             >
-              AI-Focus Technologies
+              Techsilon LLC
             </a>
             . All rights reserved. Built by{" "}
             <a 

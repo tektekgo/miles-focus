@@ -148,13 +148,13 @@ const Landing = () => {
                     <p className="text-sm font-semibold text-muted-foreground mb-3">Company</p>
                     <div className="flex flex-col gap-3 pl-3">
                       <a 
-                        href="https://www.ai-focus.org" 
+                        href="https://techsilon.com" 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-base hover:text-primary transition-all duration-300 animate-fade-in hover:translate-x-1"
                         style={{ animationDelay: "0.5s" }}
                       >
-                        AI-Focus Technologies
+                        Techsilon LLC
                       </a>
                       <a 
                         href="https://www.sujitg.com" 
@@ -415,7 +415,7 @@ const Landing = () => {
                 <h4 className="font-bold text-lg">MilesFocus</h4>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Professional mileage tracking made simple. Built by AI-Focus Technologies.
+                Professional mileage tracking made simple. Built by Techsilon LLC.
               </p>
             </div>
 
@@ -455,12 +455,12 @@ const Landing = () => {
               <h5 className="font-semibold mb-3 text-foreground">Company</h5>
               <div className="space-y-2 text-sm">
                 <a 
-                  href="https://www.ai-focus.org" 
+                  href="https://techsilon.com" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="block text-muted-foreground hover:text-primary transition-colors"
                 >
-                  AI-Focus Technologies
+                  Techsilon LLC
                 </a>
                 <a 
                   href="https://www.sujitg.com" 
@@ -488,12 +488,12 @@ const Landing = () => {
             <p>
               © {new Date().getFullYear()}{" "}
               <a 
-                href="https://www.ai-focus.org" 
+                href="https://techsilon.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="hover:text-primary transition-colors underline"
               >
-                AI-Focus Technologies
+                Techsilon LLC
               </a>
               . All rights reserved.
             </p>
