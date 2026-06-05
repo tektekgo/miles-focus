@@ -3,8 +3,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ExternalLink, Edit, Check, X } from "lucide-react";
-import { CURRENT_IRS_RATES, IRS_RATES_SOURCE_URL, formatRate, IRSRates } from "@/config/irsRates";
+import {
+  CURRENT_IRS_RATES,
+  CURRENT_YEAR,
+  AVAILABLE_YEARS,
+  getRatesForYear,
+  IRS_RATES_SOURCE_URL,
+  formatRate,
+  IRSRates,
+} from "@/config/irsRates";
 
 interface IRSRatesPanelProps {
   customRates: IRSRates | null;
@@ -14,9 +23,20 @@ interface IRSRatesPanelProps {
 export const IRSRatesPanel = ({ customRates, onRatesChange }: IRSRatesPanelProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedRates, setEditedRates] = useState<IRSRates>(customRates || CURRENT_IRS_RATES);
-  
+
   const activeRates = customRates || CURRENT_IRS_RATES;
-  const isCustom = customRates !== null;
+  const isCustom = customRates !== null && customRates.business !== getRatesForYear(customRates.year).business;
+  const selectedYear = activeRates.year;
+
+  const handleYearChange = (yearStr: string) => {
+    const year = parseInt(yearStr, 10);
+    if (year === CURRENT_YEAR) {
+      onRatesChange(null);
+    } else {
+      onRatesChange(getRatesForYear(year));
+    }
+    setIsEditing(false);
+  };
   
   const handleEdit = () => {
     setEditedRates(activeRates);
@@ -44,29 +64,35 @@ export const IRSRatesPanel = ({ customRates, onRatesChange }: IRSRatesPanelProps
         <div className="flex items-start justify-between">
           <div>
             <CardTitle className="text-xl text-primary">
-              {isCustom ? "Custom Mileage Rates" : `IRS Standard Mileage Rates (Currently ${CURRENT_IRS_RATES.year} Official Rates)`}
+              {isCustom
+                ? `Custom Mileage Rates (${selectedYear})`
+                : `IRS Standard Mileage Rates (${selectedYear}${selectedYear === CURRENT_YEAR ? " — Current" : ""})`}
             </CardTitle>
             <CardDescription>
               Rates used for calculating estimated deductions
             </CardDescription>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 items-center">
+            <Select value={String(selectedYear)} onValueChange={handleYearChange}>
+              <SelectTrigger className="w-[140px] h-9">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {AVAILABLE_YEARS.map((y) => (
+                  <SelectItem key={y} value={String(y)}>
+                    {y}{y === CURRENT_YEAR ? " (current)" : ""}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {!isEditing && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleEdit}
-              >
+              <Button variant="outline" size="sm" onClick={handleEdit}>
                 <Edit className="h-4 w-4 mr-1" />
                 Edit Rates
               </Button>
             )}
             {isCustom && !isEditing && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleReset}
-              >
+              <Button variant="ghost" size="sm" onClick={handleReset}>
                 Reset to Official
               </Button>
             )}

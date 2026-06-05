@@ -42,7 +42,7 @@ const Landing = () => {
             <img src={milesFocusLogo} alt="MilesFocus" className="h-12 md:h-16 w-auto" />
             <div>
               <h1 className="text-4xl font-bold" style={{ color: '#FFFFFF' }}>MilesFocus</h1>
-              <p className="text-base" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>by AI-Focus Technologies</p>
+              <p className="text-base" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>by Techsilon</p>
             </div>
           </Link>
           
@@ -333,12 +333,12 @@ const Landing = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-primary" />
-                  2025 IRS Rates
+                  2026 IRS Rates
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Automatically calculates deductions using current IRS standard mileage rates (Business: 70¢, Medical: 21¢, Charitable: 14¢)
+                  Automatically calculates deductions using current IRS standard mileage rates (Business: 72.5¢, Medical: 20.5¢, Charitable: 14¢). Prior tax years are also supported.
                 </p>
               </CardContent>
             </Card>
