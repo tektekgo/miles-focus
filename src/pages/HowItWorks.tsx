@@ -15,7 +15,7 @@ const HowItWorks = () => {
             <img src={logoUrl} alt="AI-Focus Logo" className="h-16 w-16" />
             <div>
               <h1 className="text-3xl font-bold text-white">MilesFocus</h1>
-              <p className="text-sm text-white/80">by AI-Focus Technologies</p>
+              <p className="text-sm text-white/80">by Techsilon</p>
             </div>
           </Link>
           <div className="flex items-center gap-3">
