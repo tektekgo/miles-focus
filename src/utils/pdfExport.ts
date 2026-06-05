@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { NormalizedTrip, MonthlySummary, TripPurpose } from "@/types/trip";
-import milesFocusLogo from "@/assets/miles-focus-logo-v1-notext.png";
+import milesFocusLogo from "@/assets/miles-focus-logo.png.asset.json";
 import { CURRENT_IRS_RATES, calculateDeduction, formatRate, IRSRates } from "@/config/irsRates";
 
 export function exportToPDF(

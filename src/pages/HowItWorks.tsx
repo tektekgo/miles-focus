@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, AlertCircle, BookOpen, DollarSign, FileText, Users } from "lucide-react";
-import logoUrl from "@/assets/ai-focus-logo.png";
+import logoUrl from "@/assets/miles-focus-logo.png.asset.json";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const HowItWorks = () => {

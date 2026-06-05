@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ArrowLeft, AlertCircle } from "lucide-react";
-import logoUrl from "@/assets/ai-focus-logo.png";
+import logoUrl from "@/assets/miles-focus-logo.png.asset.json";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const FAQ = () => {
