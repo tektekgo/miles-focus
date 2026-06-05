@@ -27,5 +27,6 @@ export default defineConfig(({ mode }) => ({
   },
   define: {
     __GIT_COMMIT_COUNT__: JSON.stringify(getGitCommitCount()),
+    __BUILD_TIMESTAMP__: JSON.stringify(new Date().toISOString()),
   },
 }));
